@@ -1,3 +1,4 @@
+package dev.courses.springdemo.assignment.injection.service;
 
 public class AppLogger {
 
