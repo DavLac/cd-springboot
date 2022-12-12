@@ -1,5 +1,8 @@
 package dev.courses.springdemo.assignment.injection.service;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class TextFormatter {
 
     private final DateTimeService dateTimeService;

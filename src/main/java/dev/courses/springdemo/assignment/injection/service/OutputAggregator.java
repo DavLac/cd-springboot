@@ -1,5 +1,8 @@
 package dev.courses.springdemo.assignment.injection.service;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class OutputAggregator {
 
     private final AppLogger appLogger;
