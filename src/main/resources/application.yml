@@ -1,0 +1,17 @@
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/demo"
+    username: postgres
+    password: password
+
+server:
+  port: 8080
+
+  error:
+    # show error message when throwing error
+    include-message: always
+    include-binding-errors: always
