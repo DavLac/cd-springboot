@@ -1,0 +1,17 @@
+
+server:
+  port: 8080
+
+  # show error message when throwing error
+  error:
+    include-message: always
+    include-binding-errors: always
+
+application:
+  # configuring external calls
+  webclient:
+    read-timeout: 30000
+    connect-timeout: 30000
+
+  star-wars-api:
+    url: https://swapi.dev/api

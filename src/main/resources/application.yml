@@ -1,5 +1,7 @@
 
 spring:
+  profiles:
+    active: @spring.profiles.active@
   jpa:
     hibernate:
       ddl-auto: update
@@ -9,9 +11,6 @@ spring:
     password: password
 
 server:
-  port: 8080
-
-  error:
-    # show error message when throwing error
-    include-message: always
-    include-binding-errors: always
+  # all endpoints should begin with this path
+  servlet:
+    contextPath: /api/v1

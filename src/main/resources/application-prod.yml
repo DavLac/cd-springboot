@@ -1,0 +1,12 @@
+
+server:
+  port: 8888
+
+application:
+  # configuring external calls
+  webclient:
+    read-timeout: 1000
+    connect-timeout: 1000
+
+  star-wars-api:
+    url: https://swapi.dev/api
