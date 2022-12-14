@@ -1,4 +1,8 @@
+package com.example.Spring_boot_demo.assignment.injection.service;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class AppLogger {
 
     public void printLog(String log) {
