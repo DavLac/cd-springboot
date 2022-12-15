@@ -80,8 +80,7 @@ class UserControllerIntTest {
                 .andExpect(status().isOk());
 
         // read response
-        UserDto response = (UserDto) jsonUtils
-                .deserializeResult(resultActions, UserDto.class);
+        UserDto response = jsonUtils.deserializeResult(resultActions, UserDto.class);
 
         // assertions
         assertNotNull(response.getId());
@@ -112,8 +111,7 @@ class UserControllerIntTest {
                 .andExpect(status().isOk());
 
         // read response
-        UserDto response = (UserDto) jsonUtils
-                .deserializeResult(resultActions, UserDto.class);
+        UserDto response = jsonUtils.deserializeResult(resultActions, UserDto.class);
 
         // assertions
         assertEquals(savedUser.getId(), response.getId());
@@ -142,8 +140,7 @@ class UserControllerIntTest {
                 .andExpect(status().isOk());
 
         // read response
-        UserDto response = (UserDto) jsonUtils
-                .deserializeResult(resultActions, UserDto.class);
+        UserDto response = jsonUtils.deserializeResult(resultActions, UserDto.class);
 
         // assertions
         assertEquals(SW_NAME, response.getName());
