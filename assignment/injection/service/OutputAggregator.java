@@ -5,7 +5,7 @@ public class OutputAggregator {
     // inject TextFormatter dependency
 
     public void printInput(String input) {
-        // call AppLogger.printLog(TextFormatter.addDateTime(input)) to print the result
+        // call appLogger.printLog(textFormatter.addDateTime(input)) to print the result
     }
 
 }
