@@ -1,4 +1,4 @@
-# JDBC training
+# Springboot - microservice training
 
 ## Prerequisites
 
@@ -25,18 +25,18 @@
 - Add Swagger
 - URL: `http://localhost:8080/api/v1/swagger-ui/index.html`
 
-## Assignment 4 - Test your CRUD
+## Assignment 5 - Test your CRUD
 
 - Using unitary tests, integration tests (mocks and in-memory database) and test coverage (Jacoco)
 
-## Assignment 5 - Use profiles
+## Assignment 6 - Use profiles
 
 - Add new running configs:
-    - Using a VM option: `-Dspring.profiles.active=prod`
-    - Using a env var: `spring_profiles_active=dev`
-    - Using Maven profile: https://www.baeldung.com/spring-profiles#maven-profile
+  - Using a VM option: `-Dspring.profiles.active=prod`
+  - Using a env var: `spring_profiles_active=dev`
+  - Using Maven profile: https://www.baeldung.com/spring-profiles#maven-profile
 
-## Assignment 6 - Call an external API
+## Assignment 7 - Call an external API
 
 - Create a new endpoint in User controller
 - This endpoint will call an external API `https://swapi.dev/api/people/{peopleId}` and take `(name, age, height)` from
