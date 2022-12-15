@@ -1,6 +1,5 @@
 package dev.courses.springdemo.repository.model;
 
-import dev.courses.springdemo.service.dto.UserDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,10 +20,4 @@ public class User {
     private Integer age;
     private Integer heightInCm;
 
-    public User(UserDto userDto) {
-        this.id = userDto.getId();
-        this.name = userDto.getName();
-        this.age = userDto.getAge();
-        this.heightInCm = userDto.getHeightInCm();
-    }
 }

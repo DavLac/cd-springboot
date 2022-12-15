@@ -3,7 +3,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: "jdbc:postgresql://localhost:5432/demo"
+    url: "jdbc:postgresql://prod-database:5432/demo"
     username: postgres
     password: password
 
@@ -17,4 +17,4 @@ application:
     connect-timeout: 1000
 
   star-wars-api:
-    url: https://swapi.dev/api
+    url: https://swapi.prod/api

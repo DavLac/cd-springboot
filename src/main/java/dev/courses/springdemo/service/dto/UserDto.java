@@ -1,6 +1,5 @@
 package dev.courses.springdemo.service.dto;
 
-import dev.courses.springdemo.repository.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,10 +28,4 @@ public class UserDto {
     @Max(300)
     private Integer heightInCm;
 
-    public UserDto(User user) {
-        this.id = user.getId();
-        this.name = user.getName();
-        this.age = user.getAge();
-        this.heightInCm = user.getHeightInCm();
-    }
 }

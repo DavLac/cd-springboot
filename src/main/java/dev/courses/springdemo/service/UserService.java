@@ -1,9 +1,12 @@
 package dev.courses.springdemo.service;
 
 import dev.courses.springdemo.controller.error.NotFoundException;
+import dev.courses.springdemo.gateway.starwars.StarWarsGateway;
+import dev.courses.springdemo.gateway.starwars.model.StarWarsPeople;
 import dev.courses.springdemo.repository.UserRepository;
 import dev.courses.springdemo.repository.model.User;
 import dev.courses.springdemo.service.dto.UserDto;
+import dev.courses.springdemo.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,44 +20,51 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StarWarsGateway starWarsGateway;
 
-    public UserDto getUserById(long id) {
-        return userRepository.findById(id)
-                .map(UserDto::new)
-                .orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", id)));
+    public UserDto getUserById(long userId) {
+        return userRepository.findById(userId)
+                .map(UserMapper::toDto)
+                .orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", userId)));
     }
 
     public UserDto createUser(UserDto userDto) {
-        var savedUser = userRepository.save(new User(userDto));
-        return new UserDto(savedUser);
+        var savedUser = userRepository.save(UserMapper.toEntity(userDto));
+        return UserMapper.toDto(savedUser);
     }
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(UserDto::new)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
-    public Page<UserDto> getAllUsersByPage(int pageNumber, int size) {
-        Page<User> userPage = userRepository.findAll(PageRequest.of(pageNumber, size));
+    public Page<UserDto> getAllUsersByPage(int pageNumber, int pageSize) {
+        Page<User> userPage = userRepository.findAll(PageRequest.of(pageNumber, pageSize));
 
         List<UserDto> userDtoList = userPage.getContent().stream()
-                .map(UserDto::new)
+                .map(UserMapper::toDto)
                 .toList();
 
         return new PageImpl<>(userDtoList, userPage.getPageable(), userPage.getTotalPages());
     }
 
-    public UserDto updateUserById(long id, UserDto userDto) {
-        userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", id)));
-        var userToUpdate = new User(userDto);
-        userToUpdate.setId(id);
+    public UserDto updateUserById(long userId, UserDto userDto) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", userId)));
+        var userToUpdate = UserMapper.toEntity(userDto);
+        userToUpdate.setId(userId);
         var updatedUser = userRepository.save(userToUpdate);
-        return new UserDto(updatedUser);
+        return UserMapper.toDto(updatedUser);
     }
 
-    public void deleteUserById(long id) {
-        userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", id)));
-        userRepository.deleteById(id);
+    public void deleteUserById(long userId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", userId)));
+        userRepository.deleteById(userId);
+    }
+
+    public UserDto createStarWarsUser(long starWarsCharacterId) {
+        StarWarsPeople starWarsPeople = starWarsGateway.getPeopleById(starWarsCharacterId);
+        var savedUser = userRepository.save(UserMapper.toEntity(starWarsPeople));
+        return UserMapper.toDto(savedUser);
     }
 }

@@ -1,7 +1,7 @@
 package dev.courses.springdemo;
 
+import dev.courses.springdemo.gateway.starwars.StarWarsGateway;
 import dev.courses.springdemo.gateway.starwars.model.StarWarsPeople;
-import dev.courses.springdemo.gateway.starwars.webclient.StarWarsGatewayWebClient;
 import dev.courses.springdemo.repository.UserRepository;
 import dev.courses.springdemo.repository.model.User;
 import dev.courses.springdemo.service.dto.UserDto;
@@ -39,6 +39,12 @@ class UserControllerIntTest {
     public static final int USER_AGE = 18;
     public static final int USER_HEIGHT = 180;
     public static final String USERS_PATH = "/users";
+    public static final String STAR_WARS_USER_PATH = "/users/starwars";
+    public static final long PEOPLE_ID = 1L;
+    public static final String SW_NAME = "luke";
+    public static final String SW_BIRTH_YEAR = "18BBY";
+    public static final int SW_AGE = 68;
+    public static final int SW_HEIGHT = 102;
     @Autowired
     private MockMvc mockMvc;
 
@@ -46,7 +52,7 @@ class UserControllerIntTest {
     private UserRepository userRepository;
 
     @MockBean
-    private StarWarsGatewayWebClient starWarsGatewayWebClient;
+    private StarWarsGateway starWarsGateway;
 
     @Autowired
     private JsonUtils jsonUtils;
@@ -58,6 +64,7 @@ class UserControllerIntTest {
 
     @Test
     void createUser_withGoodData_shouldReturnSavedUser() throws Exception {
+        // init test
         int usersBefore = userRepository.findAll().size();
 
         var request = UserDto.builder()
@@ -72,9 +79,11 @@ class UserControllerIntTest {
                         .content(asJsonString(request)))
                 .andExpect(status().isOk());
 
+        // read response
         UserDto response = (UserDto) jsonUtils
                 .deserializeResult(resultActions, UserDto.class);
 
+        // assertions
         assertNotNull(response.getId());
         assertEquals(USER_NAME, response.getName());
         assertEquals(USER_AGE, response.getAge());
@@ -88,21 +97,25 @@ class UserControllerIntTest {
     }
 
     @Test
-    void getById_withExistingUser_shouldGetUser() throws Exception {
+    void getUserById_withExistingUser_shouldGetUser() throws Exception {
+        // init test
         User savedUser = userRepository.save(User.builder()
                 .age(USER_AGE)
                 .name(USER_NAME)
                 .heightInCm(USER_HEIGHT)
                 .build());
 
+        // make request
         ResultActions resultActions = mockMvc.perform(
                         get(USERS_PATH + "/" + savedUser.getId())
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+        // read response
         UserDto response = (UserDto) jsonUtils
                 .deserializeResult(resultActions, UserDto.class);
 
+        // assertions
         assertEquals(savedUser.getId(), response.getId());
         assertEquals(USER_NAME, response.getName());
         assertEquals(USER_AGE, response.getAge());
@@ -110,25 +123,38 @@ class UserControllerIntTest {
     }
 
     @Test
-    void getByIdStarWars_withExistingPeople_shouldGetPeople() throws Exception {
-        Mockito.when(starWarsGatewayWebClient.getPeopleById(1L))
+    void createStarWarsUser_withExistingSWCharacter_shouldCreateSWUser() throws Exception {
+        // init test
+        Mockito.when(starWarsGateway.getPeopleById(PEOPLE_ID))
                 .thenReturn(StarWarsPeople.builder()
-                        .name("luke")
-                        .birthYear("19BBY")
-                        .height(102)
+                        .name(SW_NAME)
+                        .birthYear(SW_BIRTH_YEAR)
+                        .height(SW_HEIGHT)
                         .build());
 
+        int usersBefore = userRepository.findAll().size();
+
+        // make request
         ResultActions resultActions = mockMvc.perform(
-                        get("/sw/webclient/1")
+                        post(STAR_WARS_USER_PATH)
+                                .param("starWarsCharacterId", String.valueOf(PEOPLE_ID))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        StarWarsPeople response = (StarWarsPeople) jsonUtils
-                .deserializeResult(resultActions, StarWarsPeople.class);
+        // read response
+        UserDto response = (UserDto) jsonUtils
+                .deserializeResult(resultActions, UserDto.class);
 
-        assertEquals("luke", response.getName());
-        assertEquals("19BBY", response.getBirthYear());
-        assertEquals(102, response.getHeight());
+        // assertions
+        assertEquals(SW_NAME, response.getName());
+        assertEquals(SW_AGE, response.getAge());
+        assertEquals(SW_HEIGHT, response.getHeightInCm());
+
+        // database assertions
+        int usersAfter = userRepository.findAll().size();
+        assertEquals(usersBefore + 1, usersAfter);
+        assertEquals(1, usersAfter);
+        assertNotNull(userRepository.findById(response.getId()).get());
     }
 
 }

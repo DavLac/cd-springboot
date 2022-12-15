@@ -3,6 +3,9 @@ package dev.courses.springdemo.controller;
 import dev.courses.springdemo.service.UserService;
 import dev.courses.springdemo.service.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -22,48 +25,107 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("{id}")
+    @GetMapping("{userId}")
     @Operation(description = "Get user by ID")
-    public ResponseEntity<UserDto> getUserById(@PathVariable long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<UserDto> getUserById(
+            @PathVariable
+            @Parameter(description = "Existing user ID")
+            long userId
+    ) {
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     // @GetMapping -> deactivated to let "get user by page" to be used
     @Operation(description = "Get all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping
     @Operation(description = "Get all users by page")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<Page<UserDto>> getAllUsersByPage(
             @RequestParam(defaultValue = "1", required = false)
             @Positive
             @Max(10000)
+            @Parameter(description = "Page number")
             int pageNumber,
             @RequestParam(defaultValue = "50", required = false)
             @Positive
             @Max(500)
-            int size) {
-        return ResponseEntity.ok(userService.getAllUsersByPage(pageNumber - 1, size));
+            @Parameter(description = "Number of elements by page")
+            int pageSize) {
+        return ResponseEntity.ok(userService.getAllUsersByPage(pageNumber - 1, pageSize));
     }
 
     @PostMapping
     @Operation(description = "Create a user")
-    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<UserDto> createUser(
+            @RequestBody
+            @Valid
+            @Parameter(description = "User details to create")
+            UserDto userDto) {
         return ResponseEntity.ok(userService.createUser(userDto));
     }
 
-    @PutMapping("{id}")
+    @PutMapping("{userId}")
     @Operation(description = "Update a user by id")
-    public ResponseEntity<UserDto> updateUserById(@PathVariable long id, @RequestBody @Valid UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUserById(id, userDto));
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<UserDto> updateUserById(
+            @PathVariable
+            @Parameter(description = "Existing user ID")
+            long userId,
+            @RequestBody
+            @Valid
+            @Parameter(description = "User details to modify")
+            UserDto userDto
+    ) {
+        return ResponseEntity.ok(userService.updateUserById(userId, userDto));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("{userId}")
     @Operation(description = "Delete user by id")
-    public void deleteUserById(@PathVariable long id) {
-        userService.deleteUserById(id);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<Void> deleteUserById(
+            @PathVariable
+            @Parameter(description = "Existing user ID")
+            long userId) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("starwars")
+    @Operation(description = "Create a user using Star Wars API by a character ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<UserDto> createStarWarsUser(
+            @RequestParam
+            @Parameter(description = "ID of a star wars character. [Min = 1 - Max = 83]", example = "1")
+            long starWarsCharacterId
+    ) {
+        return ResponseEntity.ok(userService.createStarWarsUser(starWarsCharacterId));
     }
 
 }
