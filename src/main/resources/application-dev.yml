@@ -20,6 +20,3 @@ application:
   webclient:
     read-timeout: 30000
     connect-timeout: 30000
-
-  star-wars-api:
-    url: https://swapi.dev/api

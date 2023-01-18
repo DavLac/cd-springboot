@@ -50,7 +50,7 @@ public class UserService {
     }
 
     public UserDto updateUserById(long userId, UserDto userDto) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", userId)));
+        getUserById(userId);
         var userToUpdate = UserMapper.toEntity(userDto);
         userToUpdate.setId(userId);
         var updatedUser = userRepository.save(userToUpdate);
@@ -58,7 +58,7 @@ public class UserService {
     }
 
     public void deleteUserById(long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("User not found with id=%d", userId)));
+        getUserById(userId);
         userRepository.deleteById(userId);
     }
 

@@ -2,3 +2,7 @@ server:
   # all endpoints should begin with this path
   servlet:
     contextPath: /api/v1
+
+application:
+  star-wars-api:
+    url: https://swapi.dev/api

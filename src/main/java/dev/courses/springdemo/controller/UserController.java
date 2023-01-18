@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @RestController
@@ -121,6 +123,8 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<UserDto> createStarWarsUser(
+            @Min(1)
+            @Max(83)
             @RequestParam
             @Parameter(description = "ID of a star wars character. [Min = 1 - Max = 83]", example = "1")
             long starWarsCharacterId
