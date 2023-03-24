@@ -15,4 +15,5 @@ application:
     connect-timeout: 30000
 
   star-wars-api:
-    url: https://swapi.dev/api/test-url
+    # wiremock server url
+    url: http://localhost:9099

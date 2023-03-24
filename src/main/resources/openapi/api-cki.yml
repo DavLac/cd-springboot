@@ -1,0 +1,569 @@
+swagger: "2.0"
+info:
+  description: >-
+    This service provides an answer if the person is known at BKR, and if so
+    what the loan parts are of this person. Also it is possible that multiple
+    person fit the search criteria. These will be returned and a specific
+    request needs to be done to receive the loan parts.
+  title: CKI Checks
+  version: 0.0.1
+  x-api-id: cki-checks-0.0.1
+  x-audience: company-internal
+  contact:
+    name: Team ChecksMate
+    email: checksmate@rabobank.nl
+    url: https://rabobank.nl
+
+paths:
+  /check:
+    post:
+      summary: Request a CKI check.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: CheckRequest
+          description: "Required data for requesting a CKI check"
+          schema:
+            $ref: "#/definitions/CheckRequest"
+      responses:
+        "200":
+          description: Check correctly performed
+          schema:
+            $ref: "#/definitions/CheckResponse"
+        "400":
+          description: Bad Request, the request received was malformed.
+          schema:
+            $ref: "#/definitions/BadRequestResponse"
+        "500":
+          description: Internal Server Error
+        "504":
+          description: Timeout received from external provider
+
+  /detail:
+    post:
+      summary: Request person details based on follow-up-number
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: DetailRequest
+          description: "Required data for requesting follow-up person details"
+          schema:
+            $ref: "#/definitions/DetailRequest"
+      responses:
+        "200":
+          description: Person details correctly retreived
+          schema:
+            $ref: "#/definitions/DetailResponse"
+        "400":
+          description: Bad Request, the request received was malformed.
+          schema:
+            $ref: "#/definitions/BadRequestResponse"
+        "500":
+          description: Internal Server Error
+        "504":
+          description: Timeout received from external provider
+
+definitions:
+
+  CheckRequest:
+    description: "Data for requesting a CKI check"
+    type: object
+    required:
+      - target
+      - requester
+    properties:
+      target:
+        $ref: "#/definitions/Target"
+      scoreCardOptions:
+        description: "Supported SCORE CARD types. Allowed values: SC_01, SC_22."
+        type: array
+        items:
+          $ref: "#/definitions/ScoreCardType"
+      requester:
+        $ref: "#/definitions/Requester"
+
+  DetailRequest:
+    description: "Required data for requesting follow-up person details"
+    type: object
+    required:
+      - followUpNumber
+      - requester
+    properties:
+      followUpNumber:
+        description: "Number needed to retrieve person details from BKR"
+        type: string
+        example: "123456789"
+      scoreCardOptions:
+        description: "Supported SCORE CARD types. Allowed values: SC_01, SC_22."
+        type: array
+        items:
+          $ref: "#/definitions/ScoreCardType"
+      requester:
+        $ref: "#/definitions/Requester"
+
+  CheckResponse:
+    description: "Result of the CKI CheckRequest after applying MatchingRules and Judgement"
+    type: object
+    required:
+      - indicator
+    properties:
+      matchingRecords:
+        description: "Contains person records with loancodes and scorecards, found by the Provider (BKR) and that adhere to matching criteria"
+        type: array
+        items:
+          $ref: "#/definitions/PersonRecord"
+      nonMatchingRecords:
+        description: "Contains person records with loancodes and scorecards if available, found by the Provider (BKR) but that were excluded by matching criteria"
+        type: array
+        items:
+          $ref: "#/definitions/PersonRecord"
+      indicator:
+        description: "Indicates how the result of the BKR check can be interpreted 
+                  \n* *UNKNOWN* - Person not found in BKR or is not a match
+                  \n* *WELL_KNOWN* - Person is registered but no unusual findings
+                  \n* *ANALYSIS_NEEDED* - Person is registered and extra analysis is needed"
+        type: string
+        enum:
+          - "UNKNOWN"
+          - "WELL_KNOWN"
+          - "ANALYSIS_NEEDED"
+
+
+  DetailResponse:
+    description: "Result of the CKI CheckRequest after applying MatchingRules and Judgement"
+    type: object
+    properties:
+      matchingRecord:
+        $ref: "#/definitions/PersonRecord"
+      indicator:
+        description: "Indicates how the result of the BKR check can be interpreted 
+                  \n* *UNKNOWN* - Person not found in BKR or is not a match
+                  \n* *WELL_KNOWN* - Person is registered but no unusual findings
+                  \n* *ANALYSIS_NEEDED* - Person is registered and extra analysis is needed"
+        type: string
+        enum:
+          - "UNKNOWN"
+          - "WELL_KNOWN"
+          - "ANALYSIS_NEEDED"
+
+  BadRequestResponse:
+    type: object
+    required:
+      - message
+    properties:
+      message:
+        type: string
+        example: An error occurred
+        description: >-
+          A message that describes the error. When the error is returned from
+          the BKR service, this error is posted here.
+      errors:
+        type: array
+        description: Field errors that have occurred during validation.
+        items:
+          type: object
+          required:
+            - field
+            - message
+          properties:
+            field:
+              type: string
+              example: PersonalInfo.birthName
+              description: Which field/entity caused the error
+            message:
+              type: string
+              example: The birthdate is in the future
+              description: The reason of the validation failure
+
+  Requester:
+    description: "Identification about process or person that requested CKI check"
+    type: object
+    required:
+      - requesterId
+      - requesterType
+      - organizationId
+      - application
+      - channel
+    properties:
+      requesterId:
+        type: string
+        pattern: "[A-Z0-9]{1,50}"
+        description: "The reference ID of the person that requested the check."
+        example: "AWD6SW72SDG8345"
+      requesterType:
+        type: string
+        description: "The referenceType of the person that requested the check. Allowed values: EMPLOYEE, CUSTOMER, EXTERNAL."
+        enum:
+          - "EMPLOYEE"
+          - "CUSTOMER"
+          - "EXTERNAL"
+      organizationId:
+        type: string
+        pattern: '^[A-Za-z0-9\s.-_]{1,30}$'
+        description: >-
+          The identification of the bank the request is from. This is
+          needed to determine the "Relatienummer". This will be the
+          bankcode of the bank the customer is registered.
+      application:
+        type: string
+        pattern: '^[A-Za-z0-9\s\.\-\_]{1,30}$'
+        description: "The application that requested the check."
+        example: "SIEBEL"
+      channel:
+        type: string
+        description: "The channel used for the operation that requested the check."
+        pattern: '^[A-Za-z0-9\s\.\-\_]{1,15}$'
+        example: "Local Bank"
+
+  Target:
+    description: "Information about the person being checked in a CKI CheckRequest"
+    type: object
+    required:
+      - person
+      - address
+    properties:
+      person:
+        description: "Personal information used as input for CKI CheckRequest"
+        type: object
+        required:
+          - initials
+          - surname
+          - birthDate
+        properties:
+          initials:
+            type: string
+            pattern: '^[\p{IsLatin}\s-]{0,5}$'
+            description: "The initials of the person checked. <br>Only accepts English letters and hyphen"
+            example: "J"
+          surname:
+            type: string
+            pattern: '^[\p{IsLatin}\s.-]{0,24}$'
+            description: "The surname of the person checked. <br>Only accepts English letters, hyphen and dots"
+            example: "Doe"
+          birthSurname:
+            type: string
+            pattern: '^[\p{IsLatin}\s.-]{0,24}$'
+            description: "The birth surname of the person checked. <br>Only accepts English letters, hyphen and dots"
+            example: "Maiden"
+          partnerBirthSurname:
+            type: string
+            pattern: '^[\p{IsLatin}\s.-]{0,24}$'
+            description: "The birth surname of the partner of the person checked. <br>Only accepts English letters, hyphen and dots"
+            example: "Maiden"
+          birthDate:
+            description: "The date of birth of the person to be checked.<br>Date may not be in the future. Format should be YYYY-MM-DD."
+            type: string
+            format: date
+            example: "1969-12-28"
+      address:
+        $ref: "#/definitions/Address"
+
+  PersonRecord:
+    type: object
+    required:
+      - person
+      - address
+    properties:
+      followupNumber:
+        description: "Number needed to retrieve person details from BKR"
+        type: string
+        example: "123456789"
+      person:
+        description: "Personal data from Provider"
+        required:
+          - birthSurname
+        properties:
+          initials:
+            description: "*Voorletters* - Name initials"
+            type: string
+            example: "J D"
+            maxLength: 5
+          firstName:
+            description: "*Voornaam* - First name"
+            type: string
+            example: "Jane"
+          insertion:
+            description: "*Tussenvoegsel* - Insertion"
+            type: string
+            example: "Van"
+            maxLength: 8
+          gender:
+            description: "*Geslacht* - Gender"
+            type: string
+          birthSurname:
+            description: "*Geboortenaam* - Birth surname or 'maiden name'"
+            type: string
+            example: "Maidenname"
+            maxLength: 24
+          birthDate:
+            description: "*Geboortedatum* - Date of birth"
+            type: string
+            format: date
+            example: "1969-12-28"
+      address:
+        $ref: "#/definitions/RegistrationAddress"
+      previousAddress:
+        $ref: "#/definitions/RegistrationAddress"
+      previouslyCheckedOn:
+        type: array
+        items:
+          type: string
+          format: date
+      status:
+        type: string
+        description: "Register relevant status:
+                  \n* *REGULAR* - No special situation for the (golden) personal record
+                  \n* *DECEASED* - Person is decease
+                  \n* *UNREACHABLE* - Person couldn't be found on the registered address"
+        enum:
+          - REGULAR
+          - DECEASED
+          - UNREACHEBLE
+      contracts:
+        type: array
+        items:
+          $ref: "#/definitions/LoanContract"
+      scoreCardResults:
+        type: object
+        description: "Contains optional SC_01 and SC_22 scorecards"
+        properties:
+          SC_01:
+            type: object
+            description: "ScoreCardResult of type SC_01"
+            $ref: "#/definitions/ScoreCardResult"
+          SC_22:
+            type: object
+            description: "ScoreCardResult of type SC_22"
+            $ref: "#/definitions/ScoreCardResult"
+
+  LoanContract:
+    description: "Information about the loan"
+    type: object
+    required:
+      - amount
+      - loanType
+    properties:
+      amount:
+        description: "*Bedrag* - The amount for which the loan/contract is"
+        type: integer
+        maxLength: 8
+      loanType:
+        $ref: "#/definitions/LoanTypeDomain"
+      ownerCode:
+        description: "*EigenaarCode* - Entity (code) that owns the loan contract"
+        type: string
+      ownerContractIdentification:
+        description: "*EigenaarNumber* - Owner provided additional information. It is a free field may contain contract number or any other information provided by the owner during registration."
+        type: string
+      registrationDate:
+        description: "*Registratie* - The registration date of the loan/contract"
+        type: string
+        format: date
+        example: "1969-12-28"
+      firstPayment:
+        description: "*EersteAflossing* - The date of the first payment towards the loan/contract"
+        type: string
+        format: date
+        example: "1969-12-28"
+      estimatedLastPayment:
+        description: "*TheoretischLaatste* - The date on which the contract should be concluded"
+        type: string
+        format: date
+        example: "1969-12-28"
+      lastPayment:
+        description: "*PractischLaatste* - The date on which the contract is concluded"
+        type: string
+        format: date
+        example: "1969-12-28"
+      closedByProvider:
+        description: "*DoorBKRAfgelost* - Indication from the Provider that the loan should be regarded as payed (Sterpost)"
+        type: boolean
+      particulars:
+        description: "List of special situations (or particulars) that may happen during a loan contract lifetime. It brings some additional information from the provider"
+        type: array
+        items:
+          type: object
+          required:
+            - particular
+          properties:
+            particular:
+              $ref: "#/definitions/LoanParticularDomain"
+            registrationDate:
+              type: string
+              format: date
+              description: "Registration date of the particularity"
+              example: "1969-12-28"
+
+  ScoreCardResult:
+    description: "ScoreCardResult contains either classification, value and risk percentage or alertingcodes"
+    type: object
+    properties:
+      classification:
+        description: "Risk classification, letters further in the alphabet indicate higher risk."
+        type: string
+        example: "A"
+      value:
+        description: "Risk value, higher numbers indicate lower risk."
+        type: string
+        example: "997"
+      riskPercentage:
+        description: "Risk percentage, higher numbers indicate higher risk."
+        type: number
+        example: 1.34
+      alertingCodes:
+        description: "List of alertingCodes"
+        type: array
+        items:
+          description: "Letter-number combination"
+          type: string
+          $ref: "#/definitions/AlertingCodeType"
+          example: "F3"
+
+  AlertingCodeType:
+    description: "*Filtermeldingen* - Type of filter messages codes. Expected known values:
+                    \n* F1 - Lopend HY, RO of ZO contract met niet herstelde achterstand. \n*Ongoing HY, RO or ZO contract with unrecovered backlog.*
+                    \n\n* F2 - Lopend HY, RO of ZO contract met bijzonderheden (code 1-5). \n*Ongoing HY, RO or ZO contract with particularities (code 1-5).*
+                    \n\n* F3 - Lopende schuldregeling. \n*Ongoing debt settlement.*
+                    \n\n* F4 - Lopend AK (niet telecom), RK, RH, RN, OA, ZK of HO-contract met bijzonderheden (code 1-5) en niet-herstelde achterstand. \n*Ongoing AK (non Telecom), RK, RH, RN, OA, ZK or HO contract with particularities (code 1-5) and unrecovered arrears.*
+                    \n\n* F5 - Lopend AK - Telecom contract met niet herstelde achterstand of bijzonderheden (code 1-5). \n*Ongoing AK - Telecom contract with unrecovered arrears or particularities (code 1-5).*
+                    \n\n* G1 - Lopende schuldregeling. \n*Ongoing debt settlement.*
+                    \n\n* G2 - Lopend HY, RO of ZO contract met bijzonderheden (code 1-5). \n*Ongoing HY, RO or ZO contract with particularities (code 1-5).*
+                    \n\n* G3 - Lopend HY, RO of ZO contract met niet herstelde achterstand. \n*Ongoing HY, RO or ZO contract with unrecovered arrears.*
+                    \n\n* G4 - opend AK (niet telecom), RK (niet retail), RN, RH, OA, of ZK contract met bijzonderheden (code 1-5). \n*Ongoing AK (not telecom), RK (not retail), RN, RH, OA, or ZK contract with particularities (code 1-5).*
+                    \n\n* G5 - Lopend AK (niet telecom), RK (niet retail), RN, RH, OA, of ZK contract met niet herstelde achterstand. \n*Ongoing AK (non telecom), RK (non retail), RN, RH, OA, or ZK contract with unrecovered backlog.*
+                    \n\n* G6 - Lopend RK - Retail contract met bijzonderheden (code 1-5). \n*Ongoing RK - Retail contract with details (code 1-5).*
+                    \n\n* G7 - Lopend RK - Retail contract met niet herstelde achterstand. \n*Ongoing RK - Retail contract with unrecovered backlog.*
+                    \n\n* G8 - Lopend AK - Telecom contract met niet herstelde achterstand of bijzonderheden (code 1-5). \n*Ongoing AK - Telecom contract with unrecovered arrears or particularities (code 1-5).*
+                    \n\n* P1 - Lopende schuldregeling. \n*Ongoing debt settlement.*
+                    \n\n* P2 - Lopend HY, RO of ZO contract met bijzonderheden (code 1-3). \n*Ongoing HY, RO or ZO contract with particularities (code 1-3).*
+                    \n\n* P3 - Lopend HY, RO of ZO contract met niet herstelde achterstand. \n*Ongoing HY, RO or ZO contract with unrecovered arrears.*
+                    \n\n* P4 - Lopend AK (niet telecom), RK (niet retail), RN, RH, OA, of ZK contract met bijzonderheden (code 1-3). \n*Ongoing AK (not telecom), RK (not retail), RN, RH, OA, or ZK contract with particularities (codes 1-3).*
+                    \n\n* P5 - Lopend AK (niet telecom), RK (niet retail), RN, RH, OA, of ZK contract met niet herstelde achterstand. \n*Ongoing AK (non telecom), RK (non retail), RN, RH, OA, or ZK contract with unrecovered backlog.*
+                    \n\n* P6 - Lopend RK - Retail contract met bijzonderheden (code 1-3). \n*Ongoing RK - Retail contract with details (codes 1-3).*
+                    \n\n* P7 - Lopend RK - Retail contract met niet herstelde achterstand. \n*Ongoing RK - Retail contract with unrecovered arrears.*
+                    \n\n* P8 - Lopend AK - Telecom contract met niet herstelde achterstand of bijzonderheden (code 1-5). \n*Ongoing AK - Telecom contract with unrecovered arrears or details (code 1-5).*
+                    \n\n* U1 - Consument heeft alleen een telecom contract (zonder betalingsprobleem). \n*Consumer has only telecom contract (without payment problem).*
+
+                \n\nTechnische meldcodes* - Type of technical message codes. Expected known values:
+                    \n* *S0	- Systeemfout. Bel het Klantcontactcentrum 088-1502 500. \n*System error. Call the Customer Contact Center 088-1502 500.*
+                    \n\n* *S1 - Scorekaart niet bekend bij BKR. \n*Scorecard not known at BKR.*
+                    \n\n* *S2 - Geen abonnement voor betreffende scorekaart bij Stichting BKR. \n*No subscription for the relevant scorecard at the BKR Foundation.*
+                    \n\n* *S3 - BKR Score software onbereikbaar. \n*BKR scoring software not accessible.*
+                    \n\n* *S4 - Tijdsoverschrijding BKR Score software. \n*Time overrun BKR scoring software.*
+                    \n\n* *S5 - Foutantwoord vanuit BKR Score software. \n*Error response from BKR scoring software.*
+                    \n\n* *S6 - Ongeldige berichtversie voor betreffende scorekaart. \n*Invalid message version for the relevant scorecard.*
+                    \n* *S7 - Product BKR ScoreData niet beschikbaar voor dit communicatiekanaal. \n*BKR ScoreData product not available for this communication channel.*"
+    type: string
+    enum: [F1,F2,F3,F4,F5,G1,G2,G3,G4,G5,G6,G7,G8,P1,P2,P3,P4,P5,P6,P7,P8,U1,S0,S1,S2,S3,S4,S5,S6,S7]
+
+  ScoreCardType:
+    description: "Supported SCORE CARD types. Allowed values: SC_01, SC_22."
+    type: string
+    enum: [SC_01, SC_22]
+
+  LoanTypeDomain:
+    description: "*SoortOvereenkomst* - Type of load contracted. Expected known values:
+                              \n* *AK - Aflopend krediet*
+                              \n* *HO - Hypothecair Krediet Overig*
+                              \n* *HY - Hypotheek*
+                              \n* *OA - Operational Autolease*
+                              \n* *OH - Restschuld Hypotheek*
+                              \n* *RK - Doorlopend krediet*
+                              \n* *RN - Restschuld Hypotheek NHG*
+                              \n* *RO - Overige obligo’s*
+                              \n* *SH - Schuldhulpverlening*
+                              \n* *SK - Saneringskrediet*
+                              \n* *ZK - Zakelijk Krediet*
+                              \n* *ZO - Zakelijk Overige financiele verplichting*"
+    type: object
+    properties:
+      code:
+        description: "Acronym or code that identifies the domain element"
+        type: string
+      info:
+        description: "Description or name that describes the domain element"
+        type: string
+
+  LoanParticularDomain:
+    description: "*Bijzonderheidid* Indicate type of special occurrence/particular registered. Expected known values:
+                              \n* A - Achterstand
+                              \n* H - Herstel Achterstand
+                              \n* 1 - Aflossings/schuldregeling getroffen
+                              \n* 2 - De (restant)vordering is geheel opeisbaar gesteld
+                              \n* 3 - Een bedrag van 250 Euro of meer is afgeboekt
+                              \n* 4 - Kredietnemer blijkt/bleek onbereikbaar
+                              \n* 5 - Preventieve betaalregeling
+                              \n* 9 - Lopend geschil"
+    type: object
+    properties:
+      code:
+        description: "Acronym or code that identifies the domain element"
+        type: string
+      info:
+        description: "Description or name that describes the domain element"
+        type: string
+
+  Address:
+    description: "Address information"
+    type: object
+    required:
+      - city
+      - postalCode
+      - houseNumber
+    properties:
+      city:
+        type: string
+        pattern: "[\\p{IsLatin}\\s'-]{1,24}"
+        description: "City name. Accepts only letters, spaces, ' and -"
+        example: "s'Gravenhage"
+      postalCode:
+        type: string
+        pattern: "^[0-9]{4}[A-z]{2}$"
+        description: "Dutch postal code"
+        example: "1234AB"
+      houseNumber:
+        type: integer
+        description: "House number without extension"
+      houseNumberAdditionalInfo:
+        type: string
+        pattern: "^[A-Za-z]{0,5}$"
+        description: "House number extension"
+
+  RegistrationAddress:
+    description: "Response Address information"
+    type: object
+    required:
+      - houseNumber
+    properties:
+      country:
+        type: string
+        pattern: "[A-Z]{3}"
+        description: "ISO Alpha-3 country code for the address."
+        example: "NL"
+        maxLength: 3
+      city:
+        type: string
+        pattern: "[\\p{IsLatin}\\s'-]{1,24}"
+        description: "City name. Accepts only letters, spaces, ' and -"
+        example: "s'Gravenhage"
+        maxLength: 24
+      street:
+        type: string
+        pattern: "[\\p{IsLatin}\\s']{0,24}"
+        description: "Street name. Accepts only letters, spaces, ' and -"
+        maxLength: 24
+      postalCode:
+        type: string
+        pattern: "^[0-9]{4}[A-z]{2}$"
+        description: "Dutch postal code"
+        example: "1234AB"
+      houseNumber:
+        type: integer
+        description: "House number without extension"
+      houseNumberAdditionalInfo:
+        type: string
+        pattern: "^[A-Za-z]{0,5}$"
+        description: "House number extension"
+        maxLength: 5

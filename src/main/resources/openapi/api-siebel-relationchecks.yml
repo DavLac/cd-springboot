@@ -1,0 +1,1496 @@
+openapi: 3.0.2
+info:
+  x-api-id: 3b6b7d14-0aa8-42f6-880d-43b0600d35ac
+  title: CRM - RelationCheck - ReadOnly
+  version: 1.0.0
+  description: >
+    # Summary
+
+    This API retreives the **RelationCheck** records for an account or contact
+    within Siebel. 
+
+    In princpal the elements in the API's are derived the Distribution GGM
+    (Gebruikers Gegevens Model) which can be found here:
+
+    [GGM Digital Transformation
+    Office](https://teams.microsoft.com/l/team/19%3ae7728247af894369ad04c96abecbc0d3%40thread.skype/conversations?groupId=021710ce-0dfa-4c81-8e71-32e8f6058ae7&tenantId=6e93a626-8aca-4dc1-9191-ce291b4b75a1)
+  contact:
+    name: Team Spider
+    email: l.nl.dt.digitalcustomerprocesses.crm.crmfunctions@rabobank.nl
+servers:
+  - url: https://distributie-int-api.rabobank.nl/api/OTA
+    description: This is the OTA endpoint for applications that run in the cloud (p-int).
+  - url: https://distributie-ktn-api.intern.rabobank.nl/api/OTA
+    description: >-
+      This is the OTA endpoint used for applications deployed on-prem
+      (t-internal).
+  - url: https://distributie-int-api.rabobank.nl/api
+    description: This is the PROD endpoint for applications that run in the cloud (p-int).
+  - url: https://distributie-api.intern.rabobank.nl/api
+    description: >-
+      This is the PROD endpoint used for applications deployed on-prem
+      (p-interal).
+paths:
+  /v1/CRM/RelationChecks:
+    get:
+      tags:
+        - Generic
+      summary: >
+        Returns the requested relationcheck records for the given NP or
+        Organization identified by RelationId.
+      description: |
+        Returns the relationcheck information of a NP or Organisation:
+          * **RelationId** 
+          * **CheckId**
+          * **CheckTypeCode** 
+
+      parameters:
+        - $ref: '#/components/parameters/RelationId'
+        - $ref: '#/components/parameters/CheckTypeCode'
+        - $ref: '#/components/parameters/MostRecentFlag'
+        - $ref: '#/components/parameters/Rabobank-Flow-ID'
+        - $ref: '#/components/parameters/Rabobank-ApiKey'
+        - $ref: '#/components/parameters/Rabobank-CRM-Source-System-ID'
+        - $ref: '#/components/parameters/Rabobank-CRM-Timestamp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_RelationChecks'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST_400'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED_401'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN_403'
+        '405':
+          $ref: '#/components/responses/METHOD_NOT_ALLOWED_405'
+        '408':
+          $ref: '#/components/responses/REQUEST_TIMEOUT_408'
+        '500':
+          $ref: '#/components/responses/INTERNAL_SERVER_ERROR_500'
+        '503':
+          $ref: '#/components/responses/SERVICE_UNAVAILABLE_503'
+      security:
+        - ApiKeyAuth: []
+        - oAuth2Auth:
+            - read:RelationChecks
+  /v1/CRM/RelationChecks/DetailsCKI/{CheckId}:
+    get:
+      tags:
+        - Checkspecific
+      summary: >
+        Returns the requested relationcheck details for a record identified by
+        CheckId.
+      description: |
+        Returns the relationcheck details for a check of type CKI:
+          * **RelationId** 
+          * **CheckId**
+          * **CheckTypeCode** 
+          * **CheckStatusCode**
+          * **+ All type specific properties**
+
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/Rabobank-Flow-ID'
+        - $ref: '#/components/parameters/Rabobank-ApiKey'
+        - $ref: '#/components/parameters/Rabobank-CRM-Source-System-ID'
+        - $ref: '#/components/parameters/Rabobank-CRM-Timestamp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_CheckDetailsCKI'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST_400'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED_401'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN_403'
+        '405':
+          $ref: '#/components/responses/METHOD_NOT_ALLOWED_405'
+        '408':
+          $ref: '#/components/responses/REQUEST_TIMEOUT_408'
+        '500':
+          $ref: '#/components/responses/INTERNAL_SERVER_ERROR_500'
+        '503':
+          $ref: '#/components/responses/SERVICE_UNAVAILABLE_503'
+      security:
+        - ApiKeyAuth: []
+        - oAuth2Auth:
+            - read:CheckDetailsCKI
+components:
+  parameters:
+    CheckId:
+      name: CheckId
+      in: path
+      required: true
+      description: The unique identifier of a relationcheck
+      example: "2-155263243818"
+      schema:
+        type: string
+        pattern: ^[A-Z0-9-]{1,15}$
+    RelationId:
+      name: RelationId
+      in: query
+      required: true
+      description: The Relation Id of an NP or Organisation
+      example: "000000000012345"
+      schema:
+        type: string
+        pattern: ^[0-9]{15}$
+    CheckTypeCode:
+      name: CheckTypeCode
+      in: query
+      required: false
+      description: A code for the type of relationcheck
+      example: "G"
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{1,30}$
+        x-extended-enum:
+          - "A"
+          - "B"
+          - "C"
+          - "CCBR"
+          - "CS"
+          - "F"
+          - "CKI"
+          - "G"
+          - "M"
+          - "N"
+          - "O"
+          - "PEP"
+          - "R"
+          - "RD"
+          - "RP"
+          - "S"
+          - "UBO"
+          - "V"
+    MostRecentFlag:
+      name: MostRecentFlag
+      in: query
+      required: true
+      description: >
+        Flag to determine if only the most recent record per check type should
+        be retrieved. Default is true
+      schema:
+        type: boolean
+        default: true
+    Rabobank-ApiKey:
+      name: Rabobank-ApiKey
+      in: header
+      required: true
+      description: >
+        API Key issued when registration in the Development Portal is done by
+        application. The API key is validated in the API Implementation.
+      schema:
+        type: string
+        maxLength: 36
+    Rabobank-Flow-ID:
+      name: Rabobank-Flow-ID
+      in: header
+      required: true
+      description: >
+        The flow id of the request, which is written into the logs and passed to
+        called services. Helpful for operational troubleshooting and log
+        analysis. 
+
+        It supports traceability of requests and identifying request flows
+        through system of many services. It should be a string consisting of
+        just 
+
+        printable ASCII characters (i.e. without whitespace). Verify in a
+        received request that it fits to a specific format, has a sensible
+        maximum length 
+
+        and possibly throw out or escape characters/bytes which could crash your
+        log parsing (line breaks, tabs, spaces, NULL). If a legacy subsystem
+        can 
+
+        only work with flow IDs of a specific format, it needs to define this in
+        its API, or make its own ones.
+      schema:
+        type: string
+        maxLength: 36
+    Rabobank-CRM-Source-System-ID:
+      name: Rabobank-CRM-Source-System-ID
+      in: header
+      required: true
+      description: The application that is the origin of the message.
+      schema:
+        type: string
+        maxLength: 50
+    Rabobank-CRM-Timestamp:
+      name: Rabobank-CRM-Timestamp
+      in: header
+      required: false
+      description: The date and time of message generation. Format in Unix Timestamp
+      schema:
+        type: string
+        minimum: 1
+        maximum: 13
+  headers:
+    Rabobank-Flow-ID:
+      description: >
+        The flow id of the request, which is written into the logs and passed to
+        called services. 
+
+        Helpful for operational troubleshooting and log analysis. It supports
+        traceability of requests 
+
+        and identifying request flows through system of many services. It should
+        be a string consisting 
+
+        of just printable ASCII characters (i.e. without whitespace). Verify in
+        a received request that 
+
+        it fits to a specific format, has a sensible maximum length and possibly
+        throw out or escape 
+
+        characters/bytes which could crash your log parsing (line breaks, tabs,
+        spaces, NULL). If a 
+
+        legacy subsystem can only work with flow IDs of a specific format, 
+
+        it needs to define this in its API, or make its own ones.
+      required: true
+      example: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721
+      schema:
+        type: string
+    Rabobank-CRM-Source-System-ID:
+      description: The application that is the origin of the message.
+      required: true
+      example: Digital-Signing
+      schema:
+        type: string
+    Rabobank-CRM-Timestamp:
+      description: The date and time of message generation. Format in Unix Timestamp
+      example: 1615971002
+      required: false
+      schema:
+        type: integer
+        format: int32
+  responses:
+    OK_200_RelationChecks:
+      description: >
+        OK. Query has been performed succesfully. In case no records are found
+        an empty list is returned.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - RelationChecks
+            properties:
+              RelationChecks:
+                $ref: '#/components/schemas/RelationChecks'
+          examples:
+            NoRecords:
+              $ref: '#/components/examples/NoRecords'
+            SingleCheckTypeSuppliedSingleRecord:
+              $ref: '#/components/examples/SingleCheckTypeSuppliedSingleRecord'
+            SingleCheckTypeSuppliedPartialRecord:
+              $ref: '#/components/examples/SingleCheckTypeSuppliedPartialRecord'
+            MultiheckTypeSuppliedMoreRecords:
+              $ref: '#/components/examples/MultiheckTypeSuppliedMoreRecords'
+    OK_200_CheckDetailsCKI:
+      description: >-
+        OK. Query has been performed succesfully. In case no records are found
+        an empty list is returned.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - CheckDetailsCKI
+            properties:
+              CheckDetailsCKI:
+                $ref: '#/components/schemas/CheckDetailsCKI'
+          examples:
+            NoRecord:
+              $ref: '#/components/examples/NoDetailRecordCKI'
+            FullDetailRecord:
+              $ref: '#/components/examples/FullDetailRecordCKI'
+            PartialDetailRecord:
+              $ref: '#/components/examples/PartialDetailRecordCKI'
+    BAD_REQUEST_400:
+      description: Bad request received
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_400'
+    UNAUTHORIZED_401:
+      description: >
+        Unauthorized request received. The client must authenticate itself to
+        get the requested response
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_401'
+    FORBIDDEN_403:
+      description: >
+        The client does not have access rights to the content; that is, it is
+        unauthorized, so the server is refusing 
+
+        to give the requested resource. Unlike 401, the client's identity is
+        known to the server.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_403'
+    METHOD_NOT_ALLOWED_405:
+      description: >-
+        The request method is known by the server but has been disabled and
+        cannot be used.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_405'
+    REQUEST_TIMEOUT_408:
+      description: Timeout occured when retrieving the resource.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_408'
+    INTERNAL_SERVER_ERROR_500:
+      description: >-
+        Internal server error. Please contact system administrator. The server
+        has encountered a situation it does not know how to handle.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_500'
+    SERVICE_UNAVAILABLE_503:
+      description: >-
+        Service Unavailable. Please contact system administrator. The server is
+        unable to handle the request due to temporary overloading or maintenance
+        of the server.
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error_RQS'
+          examples:
+            simple:
+              $ref: '#/components/examples/ERROR_503'
+  schemas:
+    RelationChecks:
+      type: array
+      items:
+        $ref: '#/components/schemas/Check'
+    Check:
+      type: object
+      required:
+        - RelationId
+        - CheckId
+        - CheckTypeCode
+      properties:
+        RelationId:
+          $ref: '#/components/schemas/RelationId'
+        CheckId:
+          $ref: '#/components/schemas/CheckId'
+        CheckTypeCode:
+          $ref: '#/components/schemas/CheckTypeCode'
+        CheckStatusCode:
+          $ref: '#/components/schemas/CheckStatusCode'
+        FollowUpCode:
+          $ref: '#/components/schemas/FollowUpCode'
+        BankCode:
+          $ref: '#/components/schemas/BankCode'
+        InitiatedDateTime:
+          $ref: '#/components/schemas/InitiatedDateTime'
+        ExecutionDateTime:
+          $ref: '#/components/schemas/ExecutionDateTime'
+        CheckJudgementCode:
+          $ref: '#/components/schemas/CheckJudgementCode'
+        Application:
+          $ref: '#/components/schemas/Application'
+        ChannelCode:
+          $ref: '#/components/schemas/ChannelCode'
+        RequestorEmailAddress:
+          $ref: '#/components/schemas/RequestorEmailAddress'
+        RequestorRelationId:
+          $ref: '#/components/schemas/RelationId'
+    CheckDetailsCKI:
+      type: object
+      required:
+        - CheckDetailsHeader
+      properties:
+        CheckDetailsHeader:
+          $ref: '#/components/schemas/CheckDetailsHeader'
+        CheckDetailsCustomer:
+          $ref: '#/components/schemas/CheckDetailsCustomer'
+        CheckDetailsCKIResults:
+          $ref: '#/components/schemas/CheckDetailsCKIResults'
+    CheckDetailsHeader:
+      type: object
+      required:
+        - RelationId
+        - CheckId
+        - CheckTypeCode
+        - CheckStatusCode
+      properties:
+        RelationId:
+          $ref: '#/components/schemas/RelationId'
+        CheckId:
+          $ref: '#/components/schemas/CheckId'
+        CheckTypeCode:
+          $ref: '#/components/schemas/CheckTypeCode'
+        CheckStatusCode:
+          $ref: '#/components/schemas/CheckStatusCode'
+        FollowUpCode:
+          $ref: '#/components/schemas/FollowUpCode'
+        BankCode:
+          $ref: '#/components/schemas/BankCode'
+        InitiatedDateTime:
+          $ref: '#/components/schemas/InitiatedDateTime'
+        ExecutionDateTime:
+          $ref: '#/components/schemas/ExecutionDateTime'
+        CheckJudgementCode:
+          $ref: '#/components/schemas/CheckJudgementCode'
+        LogicalLocationCode:
+          $ref: '#/components/schemas/LogicalLocationCode'
+        CheckInformationCode:
+          $ref: '#/components/schemas/CheckInformationCode'
+        CheckInformationMessage:
+          $ref: '#/components/schemas/CheckInformationMessage'
+        Application:
+          $ref: '#/components/schemas/Application'
+        ChannelCode:
+          $ref: '#/components/schemas/ChannelCode'
+        RequestorEmailAddress:
+          $ref: '#/components/schemas/RequestorEmailAddress'
+        RequestorRelationId:
+          $ref: '#/components/schemas/RelationId'
+    CheckDetailsCustomer:
+      type: object
+      properties:
+        ShortCommercialName:
+          $ref: '#/components/schemas/ShortCommercialName'
+        ChamberOfCommerceNumber:
+          $ref: '#/components/schemas/ChamberOfCommerceNumber'
+        NameInitial:
+          $ref: '#/components/schemas/NameInitial'
+        ShortSurname:
+          $ref: '#/components/schemas/ShortSurname'
+        MaidenName:
+          $ref: '#/components/schemas/MaidenName'
+        PartnerMaidenName:
+          $ref: '#/components/schemas/PartnerMaidenName'
+        BirthDate:
+          $ref: '#/components/schemas/BirthDate'
+        StreetName:
+          $ref: '#/components/schemas/StreetName'
+        HouseNumber:
+          $ref: '#/components/schemas/HouseNumber'
+        PostalCode:
+          $ref: '#/components/schemas/PostalCode'
+        CityName:
+          $ref: '#/components/schemas/CityName'
+        CountryCode:
+          $ref: '#/components/schemas/CountryCode'
+    CheckDetailsCKIResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/CheckDetailsCKIResult'
+    CheckDetailsCKIResult:
+      type: object
+      properties:
+        ReferenceId:
+          $ref: '#/components/schemas/ReferenceId'
+        SequelNumber:
+          $ref: '#/components/schemas/SequelNumber'
+        DateOfBirth:
+          $ref: '#/components/schemas/DateOfBirth'
+        Name:
+          $ref: '#/components/schemas/Name'
+        MiddleName:
+          $ref: '#/components/schemas/MiddleName'
+        Initials:
+          $ref: '#/components/schemas/Initials'
+        TextCodesAndFreeTexts:
+          $ref: '#/components/schemas/TextCodesAndFreeTexts'
+        PreviousAddress:
+          $ref: '#/components/schemas/CheckDetailsCKIAddress'
+        CurrentAddress:
+          $ref: '#/components/schemas/CheckDetailsCKIAddress'
+        CardName:
+          $ref: '#/components/schemas/CardName'
+        CardScoreValue:
+          $ref: '#/components/schemas/CardScoreValue'
+        CardRiskClass:
+          $ref: '#/components/schemas/CardRiskClass'
+        CardRiskPercentage:
+          $ref: '#/components/schemas/CardRiskPercentage'
+        NotificationCode1:
+          $ref: '#/components/schemas/NotificationCode1'
+        NotificationCode1Description:
+          $ref: '#/components/schemas/NotificationCode1Description'
+        NotificationCode2:
+          $ref: '#/components/schemas/NotificationCode2'
+        NotificationCode2Description:
+          $ref: '#/components/schemas/NotificationCode2Description'
+        NotificationCode3:
+          $ref: '#/components/schemas/NotificationCode3'
+        NotificationCode3Description:
+          $ref: '#/components/schemas/NotificationCode3Description'
+        Loans:
+          $ref: '#/components/schemas/CheckDetailsCKILoans'
+    CheckDetailsCKIAddress:
+      type: object
+      properties:
+        Street:
+          $ref: '#/components/schemas/Street'
+        HouseNr:
+          $ref: '#/components/schemas/HouseNr'
+        ZipCode:
+          $ref: '#/components/schemas/ZipCode'
+        City:
+          $ref: '#/components/schemas/City'
+        CountryCode2:
+          $ref: '#/components/schemas/CountryCode'
+    CheckDetailsCKILoans:
+      type: array
+      items:
+        $ref: '#/components/schemas/CheckDetailsCKILoan'
+    CheckDetailsCKILoan:
+      type: object
+      properties:
+        LoanAmount:
+          $ref: '#/components/schemas/LoanAmount'
+        AccountNumber:
+          $ref: '#/components/schemas/AccountNumber'
+        FirstPayment:
+          $ref: '#/components/schemas/FirstPayment'
+        OwnedContract:
+          $ref: '#/components/schemas/OwnedContract'
+        TheoreticalLastPayment:
+          $ref: '#/components/schemas/TheoreticalLastPayment'
+        Index:
+          $ref: '#/components/schemas/Index'
+        PayedOffByBkrInd:
+          $ref: '#/components/schemas/PayedOffByBkrInd'
+        LastPayment:
+          $ref: '#/components/schemas/LastPayment'
+        WeekNumberRegistration:
+          $ref: '#/components/schemas/WeekNumberRegistration'
+        TypeOfLoanCode:
+          $ref: '#/components/schemas/TypeOfLoanCode'
+        BKRDetailCode:
+          $ref: '#/components/schemas/BKRDetailCode'
+    RelationId:
+      title: RelationId
+      type: string
+      maxLength: 15
+      description: identification of an NP or Organisation
+      example: "000000000012345"
+      pattern: ^[0-9]{15}$
+    CheckId:
+      title: CheckId
+      type: string
+      maxLength: 15
+      description: unique identifier of the check in SoR
+      example: "2-155263243818"
+      pattern: ^[A-Z0-9-]{1,15}$
+    CheckTypeCode:
+      title: CheckTypeCode
+      description: A code for the type of check of the Relation.
+      type: string
+      maxLength: 30
+      example: "G"
+      pattern: ^[A-Z]{1,30}$
+      x-extended-enum:
+        - "A"
+        - "B"
+        - "C"
+        - "CCBR"
+        - "CKI"
+        - "CS"
+        - "F"
+        - "G"
+        - "M"
+        - "N"
+        - "O"
+        - "PEP"
+        - "R"
+        - "RD"
+        - "RP"
+        - "S"
+        - "UBO"
+        - "V"
+    CheckStatusCode:
+      title: CheckStatusCode
+      description: |
+        Status of the check
+      type: string
+      example: "Completed"
+      pattern: ^[A-Za-z 0-9-._]{1,30}$
+      x-extended-enum:
+        - "Awaiting"
+        - "Cancelled"
+        - "Completed"
+        - "Elapsed"
+        - "In progress"
+        - "Not completed - techn. error"
+        - "Not completed - funct. error"
+        - "Pending"
+    FollowUpCode:
+      title: FollowUpCode
+      description: Sub status of the check
+      type: string
+      example: "O1"
+      pattern: ^[A-Z0-9]{1,30}$
+      enum:
+        - "O1"
+        - "02"
+        - "O3"
+        - "O4"
+        - "O5"
+        - "O6"
+        - "O7"
+        - "O8"
+        - "O9"
+        - "O10"
+        - "O11"
+        - "O12"
+    BankCode:
+      title: BankCode
+      description: Bank code of the customer
+      type: string
+      maxLength: 4
+      example: "3741"
+      pattern: ^[A-Za-z 0-9]{4}$
+    InitiatedDateTime:
+      title: InitiatedDateTime
+      type: string
+      format: date-time
+      maxLength: 20
+      description: Timestamp of the initiation of the check in format of RFC 3339
+      example: '2022-04-11T10:02:42Z'
+    ExecutionDateTime:
+      title: ExecutionDateTime
+      type: string
+      format: date-time
+      maxLength: 20
+      description: Timestamp of the execution of the check in format of RFC 3339
+      example: '2022-04-11T10:02:42Z'
+    CheckJudgementCode:
+      title: CheckJudgementCode
+      description: The global result of a check
+      type: string
+      maxLength: 30
+      enum:
+        - "Green"
+        - "Red"
+    Application:
+      title: Application
+      description: name of the application that created the check
+      type: string
+      maxLength: 40
+      example: "RB AB Verkoopcockpit"
+      pattern: ^[A-Za-z 0-9-._]{1,30}$
+    ChannelCode:
+      title: ChannelCode
+      description: Channel that was used to initiate the check
+      type: string
+      maxLength: 30
+      example: "EMAIL"
+      pattern: ^[A-Za-z 0-9-._]{1,30}$
+      x-extended-enum:
+        - "CHAT"
+        - "EMAIL"
+        - "F2F"
+        - "FAX"
+        - "INT NONSEC"
+        - "Internet Secure"
+        - "Local Bank"
+        - "MAIL"
+        - "MOBILE APP"
+        - "PHONE"
+        - "SEC INBOX"
+        - "SMS"
+        - "SOC MEDIA"
+        - "Telephony Central"
+        - "VIDEO CHAT"
+    RequestorEmailAddress:
+      title: RequestorEmailAddress
+      description: Email address of the bank employee that requested the check
+      type: string
+      format: email
+      maxLength: 50
+      example: "bank.employee@rabobank.nl"
+    LogicalLocationCode:
+      title: LogicalLocationCode
+      description: Location code of the relation check
+      type: string
+      maxLength: 2
+      example: "03"
+      pattern: ^[A-Za-z 0-9]{2}$
+    CheckInformationCode:
+      title: CheckInformationCode
+      description: Categorization of the result information
+      type: string
+      maxLength: 30
+      example: "BKR-Algemeen"
+      pattern: ^[A-Za-z 0-9]{30}$
+    CheckInformationMessage:
+      title: CheckInformationMessage
+      description: Description related to the CheckInformationCode
+      type: string
+      maxLength: 450
+      example: "Relatie heeft buitenlands adres"
+      pattern: ^[A-Za-z 0-9]{450}$
+    ShortCommercialName:
+      title: ShortCommercialName
+      description: Commercial name of the organization that is being checked
+      type: string
+      maxLength: 35
+      example: "Office IT B.V."
+      pattern: ^[A-Za-z 0-9]{35}$
+    ChamberOfCommerceNumber:
+      title: ChamberOfCommerceNumber
+      description: Chamber of Commerce number of the organization that is being checked
+      type: string
+      maxLength: 30
+      example: "5642279"
+      pattern: ^[A-Za-z 0-9]{30}$
+    NameInitial:
+      title: NameInitial
+      description: Initial(s) of the person that is being checked
+      type: string
+      maxLength: 25
+      example: "PJA"
+      pattern: ^[A-Za-z]{25}$
+    ShortSurname:
+      title: ShortSurname
+      description: Surname of the person that is being checked
+      type: string
+      maxLength: 35
+      example: "Peter"
+    MaidenName:
+      title: MaidenName
+      description: Maiden name of the person that is being checked
+      type: string
+      maxLength: 35
+      example: "Groot-Wassink"
+    PartnerMaidenName:
+      title: PartnerMaidenName
+      description: Maiden name of the partner of the person that is being checked
+      type: string
+      maxLength: 35
+      example: "Huis in 't Veld"
+    BirthDate:
+      title: BirthDate
+      description: BirthDate of the person that is being checked
+      type: string
+      format: date
+      example: "1980-10-25"
+    StreetName:
+      title: StreetName
+      description: Streetname of the customer that is being checked
+      type: string
+      maxLength: 35
+      example: "Kerkstraat"
+    HouseNumber:
+      title: HouseNumber
+      description: Housenumber of the customer that is being checked
+      type: string
+      example: "5A"
+      pattern: ^[1-9A-Za-z]{5}$
+    PostalCode:
+      title: PostalCode
+      description: Postal code of the customer that is being checked
+      type: string
+      example: "1234AB"
+      pattern: ^[1-9A-Za-z]{30}$
+    CityName:
+      title: CityName
+      description: City name of the customer that is being checked
+      type: string
+      maxLength: 30
+      example: "'s Hertogenbosch"
+    CountryCode:
+      title: CountryCode
+      description: Country code  of the customer that is being checked
+      type: string
+      maxLength: 30
+      example: "NL"
+    ReferenceId:
+      title: ReferenceId
+      description: Unique Identifier of the Check result record
+      type: string
+      maxLength: 15
+      example: "2-155291879104"
+    SequelNumber:
+      title: SequelNumber
+      description: Sequel number of a BKR check result
+      type: integer
+      maxLength: 11
+      example: "NN187677236"
+    DateOfBirth:
+      title: DateOfBirth
+      description: Date of birth in the check result
+      type: string
+      format: date
+      example: '1980-10-25'
+    Name:
+      title: Name
+      description: Last Name in the check result
+      type: string
+      maxLength: 50
+      example: "Heijden"
+    MiddleName:
+      title: MiddleName
+      description: Middle name in the check result
+      type: string
+      maxLength: 30
+      example: "Van der"
+    Initials:
+      title: Initials
+      description: Initials in the check result
+      type: string
+      maxLength: 25
+      example: "JW"
+    TextCodesAndFreeTexts:
+      title: TextCodesAndFreeTexts
+      description: Additional information in the check result
+      type: string
+      maxLength: 450
+      example: "05 KREDIETNEMER IS OVERLEDEN"
+    Street:
+      title: Street
+      description: Streetname on the check result
+      type: string
+      maxLength: 24
+      example: "Hofbeeklaan"
+    HouseNr:
+      title: HouseNr
+      description: Housenumber on the check result
+      type: string
+      maxLength: 10
+      example: "4A"
+    ZipCode:
+      title: ZipCode
+      description: Postal code on the check result
+      type: string
+      maxLength: 6
+      pattern: ^[1-9][0-9]{3}[a-zA-Z]{2}$
+      example: "1034AB"
+    City:
+      title: City
+      description: City name on the check result
+      type: string
+      maxLength: 24
+      example: "Amsterdam"
+    CardName:
+      title: CardName
+      description: Scorecard name on the check result
+      type: string
+      maxLength: 2
+      example: "01"
+    CardScoreValue:
+      title: CardScoreValue
+      description: Scorecard value on the check result
+      type: string
+      maxLength: 4
+      example: "0"
+    CardRiskClass:
+      title: CardRiskClass
+      description: Scorecard risk class on the check result
+      type: string
+      maxLength: 1
+      example: "B"
+    CardRiskPercentage:
+      title: CardRiskPercentage
+      description: Scorecard risk percentage on the check result
+      type: integer
+      maxLength: 7
+      example: 1.33
+    NotificationCode1:
+      title: NotificationCode1
+      description: Notification Code 1
+      type: string
+      maxLength: 30
+      example: "F1"
+    NotificationCode1Description:
+      title: NotificationCode1Description
+      description: Description of notification code 1
+      type: string
+      maxLength: 255
+      example: "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand"
+    NotificationCode2:
+      title: NotificationCode2
+      description: Notification Code 2
+      type: string
+      maxLength: 30
+      example: "F1"
+    NotificationCode2Description:
+      title: NotificationCode2Description
+      description: Description of notification code 2
+      type: string
+      maxLength: 255
+      example: "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand"
+    NotificationCode3:
+      title: NotificationCode3
+      description: Notification Code 3
+      type: string
+      maxLength: 30
+      example: "F1"
+    NotificationCode3Description:
+      title: NotificationCode3Description
+      description: Description of notification code 3
+      type: string
+      maxLength: 255
+      example: "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand"
+    LoanAmount:
+      title: LoanAmount
+      description: Amount of money loaned
+      type: string
+      maxLength: 30
+      example: "5000"
+    AccountNumber:
+      title: AccountNumber
+      description: Loan account number
+      type: string
+      maxLength: 30
+      example: "LA45922"
+    FirstPayment:
+      title: FirstPayment
+      description: 'Number that indicates moment of first payment (wwyy: 4822)'
+      type: integer
+      maxLength: 4
+      example: 4822
+    OwnedContract:
+      title: OwnedContract
+      description: ""
+      type: string
+      maxLength: 2
+      example: ''
+    TheoreticalLastPayment:
+      title: TheoreticalLastPayment
+      description: 'Number that indicates theorethical moment of last payment (wwyy: 5227)'
+      type: integer
+      maxLength: 4
+      example: 5227
+    Index:
+      title: Index
+      description: "Index number of the loan"
+      type: integer
+      maxLength: 30
+      example: 1
+    PayedOffByBkrInd:
+      title: PayedOffByBkrInd
+      description: Indication if the loan amount has been payed off
+      type: boolean
+    LastPayment:
+      title: LastPayment
+      description: 'Number that indicates actual moment of last payment (wwyy: 5027)'
+      type: integer
+      maxLength: 4
+      example: 5027
+    WeekNumberRegistration:
+      title: WeekNumberRegistration
+      description: 'Moment the loan was registered (wwyy: 0123)'
+      type: integer
+      maxLength: 4
+      example: 0123
+    TypeOfLoanCode:
+      title: TypeOfLoanCode
+      description: Type of loan code
+      type: string
+      maxLength: 30
+      example: "AK"
+      x-extended-enum:
+        - "AK"
+        - "HO"
+        - "HY"
+        - "OA"
+        - "RH"
+        - "RK"
+        - "RN"
+        - "RO"
+        - "SH"
+        - "SK"
+        - "SR"
+        - "TC"
+        - "VK"
+        - "ZK"
+        - "ZO"
+    BKRDetailCode:
+      title: BKRDetailCode
+      description: One or more detailcodes for this loan. Separated by semicolon.
+      type: string
+      maxLength: 450
+      example: "3 4912;2 3705;A 3705"
+
+    Error_RQS:
+      description: >
+        Standardised definition of reporting error information according to
+        [RFC7807] 
+
+        in case of a HTTP error code 404 for Registration Query Service (RQS).
+      type: object
+      required:
+        - type
+        - title
+        - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: >
+            A URI reference [RFC3986] that identifies the problem type. When
+            dereferenced,
+
+            it **should** provide human-readable documentation for the problem
+            type
+
+            (e.g., using HTML).
+          default: about:blank
+        title:
+          type: string
+          description: >
+            A short, summary of the problem type. Written in english and
+            readable
+
+            for engineers (usually not suited for non technical stakeholders and
+
+            not localized);
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          description: >
+            The HTTP status code generated by the origin server for this
+            occurrence of the problem.
+        detail:
+          type: string
+          description: >
+            A human readable explanation specific to this occurrence of the
+            problem.
+        instance:
+          type: string
+          format: uri
+          description: >
+            An absolute URI that identifies the specific occurrence of the
+            problem.
+
+            It may or may not yield further information if dereferenced.
+  examples:
+    NoRecords:
+      description: >
+        If the RelationId does not return any check record. This means either
+        the RelationId is non-existent or 
+
+        this relation just doesn't have any check records that match the
+        CheckTpe input condition(s).
+
+        By default only the most recent record per CheckType will be returned
+        (MostRecentOnlyFlag=true)
+      value:
+        RelationChecks: []
+    SingleCheckTypeSuppliedSingleRecord:
+      description: >
+        If the RelationId returns a single check record. Only 1 value has been
+        given for CheckType.
+
+        By default only the most recent record per CheckType will be returned
+        (MostRecentOnlyFlag=true)
+      value:
+        {
+          "RelationChecks": [
+            {
+              "CustomerRelationId": "000000094118562",
+              "CheckId": "2-155269676292",
+              "CheckTypeCode": "A",
+              "CheckStatusCode": "Awaiting",
+              "FollowUpCode": "O9",
+              "BankCode": "3033",
+              "InitiatedDateTime": "2021-10-18T09:51:05Z",
+              "ExecutionDateTime": "2021-10-18T09:51:05Z",
+              "CheckJudgementCode": "Red",
+              "Application": "PWC",
+              "ChannelCode": "Local Bank",
+              "RequestorEmployee": "employee@rabobank.nl"
+            }
+          ]
+        }
+    SingleCheckTypeSuppliedPartialRecord:
+      description: >
+        If the RelationId returns a record with partial information. This is
+        possible because not all fiels are mandatory. Empty fields are left out
+        of the response.
+      value:
+        {
+          "RelationChecks": [
+            {
+              "CustomerRelationId": "000000094118562",
+              "CheckId": "2-1ZBRXQEV",
+              "CheckTypeCode": "C",
+              "BankCode": "3033",
+              "ExecutionDateTime": "2021-11-03T09:51:05Z",
+              "CheckJudgementCode": "Green",
+              "RequestorEmployee": "employee@rabobank.nl"
+            }
+          ]
+        }
+    MultiheckTypeSuppliedMoreRecords:
+      description: >
+        If the CheckType is supplied with multiple values then the RelationId
+        can return multiple check records
+
+        By default only the most recent record per CheckType will be returned
+        (MostRecentOnlyFlag=true)
+
+        Empty properties are not returned in the response.
+      value:
+        {
+          "RelationChecks": [
+            {
+              "CustomerRelationId": "000000094118562",
+              "CheckId": "2-155269676292",
+              "CheckTypeCode": "A",
+              "CheckStatusCode": "Awaiting",
+              "FollowUpCode": "O9",
+              "BankCode": "3033",
+              "InitiatedDateTime": "2021-10-18T09:51:05Z",
+              "ExecutionDateTime": "2021-10-18T09:51:05Z",
+              "CheckJudgementCode": "Red",
+              "Application": "PWC",
+              "ChannelCode": "Local Bank",
+              "RequestorEmployee": "employee@rabobank.nl"
+            },
+            {
+              "CustomerRelationId": "000000094118562",
+              "CheckId": "2-1ZBRXQEV",
+              "CheckTypeCode": "C",
+              "BankCode": "3033",
+              "ExecutionDateTime": "2021-11-03T09:51:05Z",
+              "CheckJudgementCode": "Green",
+              "RequestorEmployee": "employee@rabobank.nl"
+            }
+          ]
+        }
+    NoDetailRecordCKI:
+      description: |
+        If the given CheckId does not retrieve a record with details.
+      value:
+        CheckDetailsCKI: []
+    PartialDetailRecordCKI:
+      description: |
+        If the given CheckId retrieves a partial set of attributes.
+      value:
+        {
+          CheckDetailsCKI: [
+            {
+              "CheckDetailsHeader": {
+                "RelationId": "000000000012345",
+                "CheckId": "2-155263243818",
+                "CheckTypeCode": "G",
+                "CheckStatusCode": "Completed",
+                "FollowUpCode": "O1",
+                "BankCode": "3741",
+                "InitiatedDateTime": "2022-04-11T10:02:42Z",
+                "ExecutionDateTime": "2022-04-11T10:02:42Z",
+                "CheckJudgementCode": "Green",
+                "LogicalLocationCode": "03",
+                "CheckInformationCode": "BKR-Algemeen",
+                "CheckInformationMessage": "Relatie heeft buitenlands adres",
+                "Application": "RB AB Verkoopcockpit",
+                "ChannelCode": "EMAIL",
+                "RequestorRelationId": "000000000012345"
+              },
+              "CheckDetailsCustomer": {
+                "ShortCommercialName": "Office IT B.V.",
+                "ChamberOfCommerceNumber": "5642279",
+                "NameInitial": "PJA",
+                "ShortSurname": "Peter",
+                "MaidenName": "Groot-Wassink",
+                "PartnerMaidenName": "Huis in 't Veld",
+                "BirthDate": "1980-10-25",
+                "StreetName": "Kerkstraat",
+                "HouseNumber": "5A",
+                "PostalCode": "1234AB",
+                "CityName": "'s Hertogenbosch",
+                "CountryCode": "NL"
+              },
+              "CheckDetailsCKIResults": [
+                {
+                  "ReferenceId": "2-155291879104",
+                  "SequelNumber": "NN187677236",
+                  "DateOfBirth": "1980-10-25",
+                  "Name": "Heijden",
+                  "MiddleName": "Van der",
+                  "Initials": "JW",
+                  "TextCodesAndFreeTexts": "05 KREDIETNEMER IS OVERLEDEN",
+                  "CurrentAddresses": {
+                    "Street": "Hofbeeklaan",
+                    "HouseNr": "4A",
+                    "ZipCode": "1034AB",
+                    "City": "Amsterdam",
+                    "CountryCode2": "NL"
+                  },
+                  "PreviousAddress": {
+                    "Street": "Dorpsstraat",
+                    "HouseNr": "40",
+                    "ZipCode": "1638FB",
+                    "City": "Rotterdam",
+                    "CountryCode2": "NL"
+                  },
+                  "CardName": "01",
+                  "CardScoreValue": "0",
+                  "CardRiskClass": "B",
+                  "CardRiskPercentage": 1.33,
+                }
+              ]
+            }
+          ]
+        }
+    FullDetailRecordCKI:
+      description: |
+        If the given CheckId returns a full set of attributes.
+      value:
+        {
+          CheckDetailsCKI: [
+            {
+              "CheckDetailsHeader": {
+                "RelationId": "000000000012345",
+                "CheckId": "2-155263243818",
+                "CheckTypeCode": "G",
+                "CheckStatusCode": "Completed",
+                "FollowUpCode": "O1",
+                "BankCode": "3741",
+                "InitiatedDateTime": "2022-04-11T10:02:42Z",
+                "ExecutionDateTime": "2022-04-11T10:02:42Z",
+                "CheckJudgementCode": "Green",
+                "LogicalLocationCode": "03",
+                "CheckInformationCode": "BKR-Algemeen",
+                "CheckInformationMessage": "Relatie heeft buitenlands adres",
+                "Application": "RB AB Verkoopcockpit",
+                "ChannelCode": "EMAIL",
+                "RequestorEmailAddress": "bank.employee@rabobank.nl",
+              },
+              "CheckDetailsCustomer": {
+                "ShortCommercialName": "Office IT B.V.",
+                "ChamberOfCommerceNumber": "5642279",
+                "NameInitial": "PJA",
+                "ShortSurname": "Wassink",
+                "MaidenName": "Groot-Wassink",
+                "PartnerMaidenName": "Huis in 't Veld",
+                "BirthDate": "1980-10-25",
+                "StreetName": "Kerkstraat",
+                "HouseNumber": "5A",
+                "PostalCode": "1234AB",
+                "CityName": "'s Hertogenbosch",
+                "CountryCode": "NL"
+              },
+              "CheckDetailsCKIResults": [
+                {
+                  "ReferenceId": "2-155291879104",
+                  "SequelNumber": "NN187677236",
+                  "DateOfBirth": "1980-10-25",
+                  "Name": "Heijden",
+                  "MiddleName": "Van der",
+                  "Initials": "JW",
+                  "TextCodesAndFreeTexts": "05 KREDIETNEMER IS OVERLEDEN",
+                  "CurrentAddresses": {
+                    "Street": "Hofbeeklaan",
+                    "HouseNr": "4A",
+                    "ZipCode": "1034AB",
+                    "City": "Amsterdam",
+                    "CountryCode2": "NL"
+                  },
+                  "PreviousAddress": {
+                    "Street": "Dorpsstraat",
+                    "HouseNr": "40",
+                    "ZipCode": "1638FB",
+                    "City": "Rotterdam",
+                    "CountryCode2": "NL"
+                  },
+                  "CardName": "01",
+                  "CardScoreValue": "0",
+                  "CardRiskClass": "B",
+                  "CardRiskPercentage": 1.33,
+                  "NotificationCode1": "F2",
+                  "NotificationCode1Description": "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand",
+                  "NotificationCode2": "F2",
+                  "NotificationCode2Description": "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand",
+                  "NotificationCode3": "F3",
+                  "NotificationCode3Description": "Kredietnemer niet gescoord, heeft lopend negatief contract met niet herstelde achterstand",
+                  "Loans": [
+                    {
+                      "LoanAmount": "5000",
+                      "AccountNumber": "LA45922",
+                      "FirstPayment": 4822,
+                      "OwnedContract": "",
+                      "TheoreticalLastPayment": 5227,
+                      "Index": 1,
+                      "PayedOffByBkrInd": true,
+                      "LastPayment": 5027,
+                      "WeekNumberRegistration": 123,
+                      "TypeOfLoanCode": "AK",
+                      "BKRDetailCode": "3 4912;2 3705;A 3705"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+    ERROR_400:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Bad request received
+        status: '400'
+        detail: Element Rabobank_Flow_ID is missing
+    ERROR_401:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Unauthorized request received
+        status: '401'
+        detail: Unauthorized request received
+    ERROR_403:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Forbidden
+        status: '403'
+        detail: The client does not have access rights to the content
+    ERROR_405:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Method not allowed
+        status: '405'
+        detail: The requested method on the resource is not allowed
+    ERROR_408:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Request timeout
+        status: '408'
+        detail: Request time out occured when performing action on resource
+    ERROR_500:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Internal server error
+        status: '500'
+        detail: Internal server error. Please contact system administrator.
+    ERROR_503:
+      value:
+        type: >-
+          https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications
+        title: Service Unavailable
+        status: '503'
+        detail: >-
+          Service Unavailable. Please contact system administrator. The server
+          is unable to handle the request due to temporary overloading or
+          maintenance of the server.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Rabobank-ApiKey
+      in: header
+    oAuth2Auth:
+      type: oauth2
+      description: >
+        This API uses OAuth2 for authentication within the API Gateway. [More
+        info]
+        https://confluence.dev.rabobank.nl/pages/viewpage.action?spaceKey=Integration&title=6.+Access+APIs+secured+by+OAuth+2.0
+
+        By default the OAS will describe the usage of OAuth2 with client
+        credentials but it is highly recommended to use certficates when
+        retrieving the JWT token voor Azure Active Directory (AAD).
+
+        Use URL to retrieve more information about registering an application in
+        AAD and using certificates as credential.
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://login.microsoftonline.com/6e93a626-8aca-4dc1-9191-ce291b4b75a1/oauth2/v2.0/token
+          scopes:
+            read:RelationChecks: Grant access for RelationChecks
+            read:CheckDetailsCKI: Grant access for CheckDetailsCKI

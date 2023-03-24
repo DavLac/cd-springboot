@@ -3,9 +3,8 @@ package dev.courses.springdemo.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -13,13 +12,15 @@ import java.io.UnsupportedEncodingException;
 
 import static com.fasterxml.jackson.databind.cfg.ConstructorDetector.USE_PROPERTIES_BASED;
 
-@Component
 public class JsonUtils {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new ParameterNamesModule())
+            .addModule(new JavaTimeModule()) // handle time
+            .constructorDetector(USE_PROPERTIES_BASED)
+            .build();
 
-    public static String asJsonString(final Object obj) {
+    public static String toJsonString(final Object obj) {
         try {
             ObjectMapper mapper = JsonMapper.builder()
                     .addModule(new ParameterNamesModule())
@@ -31,9 +32,8 @@ public class JsonUtils {
         }
     }
 
-    public <T> T deserializeResult(ResultActions resultActions, Class<T> clazz)
+    public <T> T deserializeResult(MvcResult result, Class<T> clazz)
             throws JsonProcessingException, UnsupportedEncodingException {
-        MvcResult result = resultActions.andReturn();
         String contentAsString = result.getResponse().getContentAsString();
         return objectMapper.readValue(contentAsString, clazz);
     }

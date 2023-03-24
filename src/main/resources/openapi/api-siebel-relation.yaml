@@ -1,0 +1,1147 @@
+openapi: "3.0.3"
+info:
+  title: 'CRM - Relation - Basic - ReadOnly'
+  version: '1.0.0'
+  description: |
+     # Summary
+     API used to retrieve basic information of NP and ORG.
+     All the elements in the API's are according to the Distribution GGM (Gebruikers Gegevens Model) which can be found here:
+     [GGM Digital Transformation Office](https://teams.microsoft.com/l/team/19%3ae7728247af894369ad04c96abecbc0d3%40thread.skype/conversations?groupId=021710ce-0dfa-4c81-8e71-32e8f6058ae7&tenantId=6e93a626-8aca-4dc1-9191-ce291b4b75a1)
+     
+  x-api-id: 630a3719-d5c3-426c-a807-a3d0951f1168
+
+  x-audience: company-internal
+  contact:
+    name: Tribe Digital Customer Processes
+    email: l.nl.sys.dis.crm.siebel.hydra@rabobank.nl
+servers:
+  - url: https://distributie-int-api.rabobank.nl/v1/OTA
+    description: |
+      This is the OTA endpoint for applications that run in the cloud (p-int).
+  - url: https://distributie-ktn-api.intern.rabobank.nl/v1/OTA
+    description: |
+      This is the OTA endpoint used for applications deployed on-prem t-internal).
+  - url: https://distributie-int-api.rabobank.nl/v1
+    description: |
+      This is the PROD endpoint for applications that run in the cloud (p-int).
+  - url: https://distributie-api.intern.rabobank.nl/v1
+    description: |
+      This is the PROD endpoint used for applications deployed on-prem (p-internal).
+
+paths:
+  #####################################################
+  # Query Relation Service
+  #####################################################
+  /CRM/RelationBasic/{RelationId}:
+    get:
+      summary: Returns the basic information about a Natural Person or Organisation based on the relation Id.
+      description: |
+
+        # Examples:
+          **NaturalPerson**
+          
+            If a requestor sends the Relation ID of a Natural Person, the following example shows what the response would look like.
+            
+            "Relation": {
+              "RelationId": "000000095377365",
+              "InvolvedPartyCode": "Person",
+              "StatusTypeCode": "C",
+              "CorrespondenceLanguageCode": "NL",
+              "ResidenceCountryCode": "NL",
+              "WwftStatusCode": "Compliant",
+              "BankCode": "1605",
+              "LogicalLocationCode": "160510",
+              "CustomerMarketSegmentCode": "84",
+              "PrimaryTelephone": "179956811      ",
+              "PrimaryTelephoneType": "Overig",
+              "AddressTypeCode": "1",
+              "CorrespondenceFlag": true,
+              "PostalCode": "8051KW",
+              "HouseNumber": "1",
+              "HouseNumberExtension": "A",
+              "StreetSuffix": "#",
+              "StreetName": "Str_Hepialoidea",
+              "CityName": "HATTEM",
+              "CountryCode": "NL",
+              "SpecialAdministrationIndicator": false,
+              "NaturalPerson": {
+                "Surname": "Baccharishavardii",
+                "ShortSurname": "Baccharishavardii",
+                "SurnamePrefix": "van",
+                "SurnameSuffix": "Jr.",
+                "GivenName": "Anne-Marie",
+                "NameInitial": "C.M.V.",
+                "MaidenName": "Boecheracollinsii",
+                "MaidenNamePrefix": "van",
+                "GivenNameAll": "Aimee",
+                "NameQualificationPrefix": "Prof.",
+                "NobilitySalutation": "HI",
+                "NameQualificationSuffix": "MBA",
+                "BirthDate": "2000-12-15",
+                "GenderCode": "F",
+                "DeceasedFlag": "false"}}
+             
+          **Organisation:**
+          
+            If a requestor sends the Relation ID of an Organisation, the following example shows what the response would look like.
+                
+            "Relation": {
+              "RelationId": "000009423739099",
+              "InvolvedPartyCode": "Organization",
+              "StatusTypeCode": "C",
+              "CorrespondenceLanguageCode": "NL",
+              "ResidenceCountryCode": "NL",
+              "WwftStatusCode": "Compliant",
+              "BankCode": "3000",
+              "LogicalLocationCode": "334299",
+              "CustomerMarketSegmentCode": "51",
+              "PrimaryEmail": "Nuttalliapterosperma@rabobank.nl",
+              "PrimaryTelephone": "312961172      ",
+              "PrimaryTelephoneType": "Overig",
+              "AddressTypeCode": "1",
+              "CorrespondenceFlag": true,
+              "PostalCode": "1106LW",
+              "HouseNumber": "39",
+              "HouseNumberExtension": "A",
+              "StreetSuffix": "#",
+              "StreetName": "Str_Bovidae",
+              "CityName": "AMSTERDAM",
+              "CountryCode": "NL",
+              "SpecialAdministrationIndicator": false,
+              "Organisation": {
+                "LegalStructureTypeCode": "BV",
+                "LegalName": "Collene Ditaxislanceolata                                                                                                                                                                               ",
+                "CommercialName": "Collene Ditaxislanceolata",
+                "ShortCommercialName": "Collene Ditaxislanceolata",
+                "KvKNumber": "66858925",
+                "KvKBranchnumber": "000035448822",
+                "UciWorldWideId": "UCIWWID-5679",
+                "NationalIdentifier": "NAT_ID-1234}}
+
+      parameters:
+        #path
+        - $ref: '#/components/parameters/RelationId'
+        
+        #query
+        - $ref: '#/components/parameters/fields'
+        
+        #header
+          #common header parameter
+        - $ref: '#/components/parameters/Rabobank-Flow-ID'
+        - $ref: '#/components/parameters/Rabobank-ApiKey'
+          
+          #CRM header parameters
+        - $ref: '#/components/parameters/Rabobank-CRM-Source-System-ID'
+        - $ref: '#/components/parameters/Rabobank-CRM-Timestamp'
+
+        #NO REQUEST BODY
+
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_GetRelation"
+        '400': 
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+          
+  
+security:
+- ApiKeyAuth: []
+- oAuth2Auth: [] 
+
+components:
+#####################################################
+# Predefined Components
+#####################################################
+
+  parameters:
+  #####################################################
+  # Reusable Input Parameters
+  #####################################################
+    RelationId:
+      name: RelationId
+      in: path
+      required: true
+      description: The Relation Id of an NP or Organisation
+      example: '000000000012345'
+      schema:
+        type: string
+        pattern: '^[0-9]{15}$'
+    
+    fields:
+        name: FilterFields
+        in: query
+        required: false
+        description: 'Query'            
+        schema:
+          type: string
+          
+    Rabobank-ApiKey:
+        name: Rabobank-ApiKey
+        in: header
+        required: true
+        description: API Key issued when registration in the Development Portal is done by application. The API key is validated in the API Implementation.
+        example: 'e7f7b57a-4010-4a6a-9bc4-d6aa4421fe99'
+        schema:
+          type: string
+          maxLength: 36
+          
+    Rabobank-Flow-ID:
+        name: Rabobank-Flow-ID
+        in: header
+        required: true
+        description: |
+          The flow id of the request, which is written into the logs and passed to called services. Helpful for operational troubleshooting and log analysis. 
+          It supports traceability of requests and identifying request flows through system of many services. It should be a string consisting of just printable ASCII characters (i.e. without whitespace). Verify in a received request that it fits to a specific format, has a sensible maximum length and possibly throw out or escape characters/bytes which could crash your log parsing (line breaks, tabs, spaces, NULL). If a legacy subsystem can only work with flow IDs of a specific format, it needs to define this in its API, or make its own ones.
+        example: '99391c7e-ad88-49ec-a2ad-99ddcb1f7721'
+        schema:
+          type: string
+          maxLength: 36
+          
+    Rabobank-CRM-Source-System-ID:
+        name: Rabobank-CRM-Source-System-ID
+        in: header
+        required: true
+        description: The application that is the origin of the message. 
+        example: 'Digital Signing'
+        schema:
+          type: string
+          maxLength: 50
+          
+    Rabobank-CRM-Timestamp:
+        name: Rabobank-CRM-Timestamp
+        in: header
+        required: false
+        description: The date and time of message generation. Format in Unix Timestamp
+        example: 1615971002
+        schema:
+          type: string
+          minimum: 1
+          maximum: 13
+  
+  headers:
+  #####################################################
+  # Reusable Response Header Elements
+  #####################################################
+    
+    Rabobank-Flow-ID:
+      description: |
+        The flow id of the request, which is written into the logs and passed to called services
+        Helpful for operational troubleshooting and log analysis. It supports traceability of requests and identifying request flows through system of many services. It should be a string consisting of just printable ASCII characters (i.e. without whitespace). Verify in a received request that it fits to a specific format, has a sensible maximum length and possibly throw out or escape characters/bytes which could crash your log parsing (line breaks, tabs, spaces, NULL). If a legacy subsystem can only work with flow IDs of a specific format, it needs to define this in its API, or make its own ones.
+      required: true
+      example: '99391c7e-ad88-49ec-a2ad-99ddcb1f7721'
+      schema:
+        type: string
+        
+    Rabobank-CRM-Source-System-ID:
+      description: The application that is the origin of the message. 
+      required: true
+      example: 'Digital-Signing'
+      schema:
+        type: string
+        
+    Rabobank-CRM-Timestamp:
+      description: The date and time of message generation. Format in Unix Timestamp 
+      example: 1615971002
+      required: false
+      schema:
+        type: integer
+        format: int32
+
+  #####################################################
+  # Reusable Responses
+  #####################################################
+  responses:
+    
+    OK_200_GetRelation:
+      description: OK, Relation record found and returned.
+      
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - Relation
+            properties:
+              Relation:
+                $ref: "#/components/schemas/Relation"
+          examples:      
+            NaturalPerson:
+              $ref: "#/components/examples/NaturalPerson"
+            Organisation:  
+              $ref: "#/components/examples/Organisation"
+
+    BAD_REQUEST_400:
+      description: Bad request received
+      
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref" 
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_400"
+            
+
+    UNAUTHORIZED_401:
+      description: Unauthorized request received. The client must authenticate itself to get the requested response
+      
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref" 
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_401"
+
+    FORBIDDEN_403:
+      description: |
+        The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing 
+        to give the requested resource. Unlike 401, the client's identity is known to the server.
+      
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref" 
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_403"
+    
+    NOT_FOUND_404:
+      description: Relation not found
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref" 
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_404"
+    
+    
+    METHOD_NOT_ALLOWED_405:
+      description: The request method is known by the server but has been disabled and cannot be used.
+
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref" 
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_405"
+
+
+    REQUEST_TIMEOUT_408:
+      description: Timeout occured when retrieving the resource.
+
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref"
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_408"
+              
+    INTERNAL_SERVER_ERROR_500:
+      description: Internal server error. Please contact system administrator. The server has encountered a situation it does not know how to handle.
+
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref"
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_500"
+              
+    SERVICE_UNAVAILABLE_503:
+      description: Service Unavailable. Please contact system administrator. The server is unable to handle the request due to temporary overloading or maintenance of the server.
+
+      headers:
+        Rabobank-Flow-ID:
+          $ref: '#/components/headers/Rabobank-Flow-ID'
+        Rabobank-CRM-Source-System-ID:
+          $ref: '#/components/headers/Rabobank-CRM-Source-System-ID'
+        Rabobank-CRM-Timestamp:
+          $ref: '#/components/headers/Rabobank-CRM-Timestamp'
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error_CommPref"
+          examples:
+            simple: 
+              $ref: "#/components/examples/ERROR_503"
+
+
+  #####################################################
+  # Reusable schemas
+  #####################################################
+  schemas:
+    Relations:
+      type: object
+      items:
+        $ref: '#/components/schemas/Relation'
+    Relation:
+      type: object
+      required:
+        - RelationId
+        - InvolvedPartyCode
+        - StatusTypeCode
+        - ResidenceCountryCode
+        - WwftStatusCode
+        - BankCode
+        - CustomerMarketSegmentCode
+        - AddressTypeCode
+        - CorrespondenceFlag
+        - PostalCode
+        - HouseNumber
+        - StreetName
+        - CityName
+        - CountryCode
+      properties:
+          RelationId:
+            $ref: '#/components/schemas/RelationId'
+          InvolvedPartyCode:
+            $ref: '#/components/schemas/InvolvedPartyCode'
+          StatusTypeCode:
+            $ref: '#/components/schemas/StatusTypeCode'
+          CorrespondenceLanguageCode:
+            $ref: '#/components/schemas/CorrespondenceLanguageCode'
+          ResidenceCountryCode:
+            $ref: '#/components/schemas/ResidenceCountryCode'
+          WwftStatusCode:
+            $ref: '#/components/schemas/WwftStatusCode'
+          BankCode:
+            $ref: '#/components/schemas/BankCode'
+          LogicalLocationCode:
+            $ref: '#/components/schemas/LogicalLocationCode'
+          CustomerMarketSegmentCode:
+            $ref: '#/components/schemas/CustomerMarketSegmentCode'
+          PrimaryEmail:
+            $ref: '#/components/schemas/PrimaryEmail'
+          PrimaryTelephone:
+            $ref: '#/components/schemas/PrimaryTelephone'
+          PrimaryTelephoneType:
+            $ref: '#/components/schemas/PrimaryTelephoneType'
+          AddressTypeCode:
+            $ref: '#/components/schemas/AddressTypeCode'
+          CorrespondenceFlag:
+            $ref: '#/components/schemas/CorrespondenceFlag'
+          PostalCode:
+            $ref: '#/components/schemas/PostalCode'
+          HouseNumber:
+            $ref: '#/components/schemas/HouseNumber'
+          HouseNumberExtension:
+            $ref: '#/components/schemas/HouseNumberExtension'
+          StreetSuffix:
+            $ref: '#/components/schemas/StreetSuffix'
+          StreetName:
+            $ref: '#/components/schemas/StreetName'
+          CityName:
+            $ref: '#/components/schemas/CityName'
+          CountryCode:
+            $ref: '#/components/schemas/CountryCode'
+          SpecialAdministrationIndicator:
+            $ref: '#/components/schemas/SpecialAdministrationIndicator'
+          NaturalPerson:
+            $ref: '#/components/schemas/NaturalPerson'
+          Organisation:
+            $ref: '#/components/schemas/Organisation'
+      additionalProperties: false
+    RelationId:
+      title: RelationId
+      type: string
+      maxLength: 15
+      description: identification of an NP or Organisation
+      example: '000000000012345'
+      pattern: '^[0-9]{15}$'
+    InvolvedPartyCode:
+      description: | 
+        The code indicating whether the Relation is a Natural Person or an Organization.
+        - 'Organisation': 'Relation is an Organisation'
+        - 'Person': 'Relation is a Natural Person'
+      type: string
+      maxLength: 15
+      example: 'Person'
+      x-extensible-enum: 
+        - 'Organisation'
+        - 'Person'
+    StatusTypeCode:
+      description: | 
+        The code indicating the status of a Relation within the Bank
+      type: string
+      maxLength: 50
+      example: 'C'
+      x-extensible-enum: 
+        - 'S'
+        - 'P'        
+        - 'C'
+        - 'E'
+        - 'Y'
+    CorrespondenceLanguageCode:
+      description: | 
+        The code of the Langeuage used in the correspondence with the Relation
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_CORR_LANG_AB'
+      type: string
+      maxLength: 50
+      example: 'NL'
+    ResidenceCountryCode:
+      description: | 
+        Code of the country where the Relation is officially established.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'COUNTRY'
+      type: string
+      maxLength: 50
+      example: 'NL'
+    WwftStatusCode:
+      description: | 
+        The code indicating the status of the WWFT compliancy of the Relation
+      type: string
+      maxLength: 30
+      example: 'Compliant'
+      x-extensible-enum: 
+        - 'Compliant'
+        - 'NotCompliant'        
+        - 'ToBeCalculated'
+    BankCode:
+      description: | 
+        The unique, 4-digit identifier of a local bank or other institution within the Rabobank organisation.
+      type: string
+      maxLength: 50
+      example: '3003'
+    LogicalLocationCode:
+      description: | 
+        The unique identification of the LogicalLocation.
+      type: string
+      maxLength: 2
+      example: '32'
+    CustomerMarketSegmentCode:
+      description: | 
+        The segment that is primarily responsible for serving the Relation
+      type: string
+      maxLength: 30
+      example: '90'
+      x-extensible-enum: 
+        - '90'
+        - '91'
+        - '97'
+        - '89'
+        - '52'
+        - '51'
+        - '61'
+        - '62'
+        - '71'
+        - '76'
+        - '99'
+        - '98'
+        - '92'
+        - '84'
+        - '80'
+        - '81'
+        - '82'
+        - '83'
+        - '85'
+    PrimaryEmail:
+      description: | 
+        The Primary email address of the Relation.
+      type: string
+      maxLength: 200
+      example: 'abc@kpn.com'
+    PrimaryTelephone:
+      description: | 
+        The Primary telephone number of the Relation.
+      type: string
+      maxLength: 12
+      example: '+31630302156'
+    PrimaryTelephoneType:
+      description: | 
+        The Type of Primary telephone number of the Relation.
+      type: string
+      maxLength: 30
+      example: 'Zakelijk'
+      x-extensible-enum: 
+        - 'Mobiel'
+        - 'Overig'
+        - 'Fax'
+    AddressTypeCode:
+      description: | 
+        A code for the type of address of the Relation.
+      type: string
+      maxLength: 1
+      example: '3'
+      x-extensible-enum: 
+        - '1'
+        - '3'
+    CorrespondenceFlag:
+      description: | 
+        An attribute indicating if the address may be used for correspondence with the relation.
+      type: boolean
+      example: true
+    PostalCode:
+      description: | 
+        An identification for a Geographic Area defined by postal authorities to facilitate mail delivery services.
+      type: string
+      maxLength: 30
+      example: '3527XB'
+    HouseNumber:
+      description: | 
+        The designation of the house in the street, PO Box, Freepost or the PostAppart number
+      type: string
+      maxLength: 30
+      example: '420'
+    HouseNumberExtension:
+      description: | 
+        Addition to a house number in order to determine a location uniquely.
+      type: string
+      maxLength: 10
+      example: 'abc'
+    StreetSuffix:
+      description: | 
+        Further specification of the address in addition to the street name or house number.
+      type: string
+      maxLength: 100
+      example: 'gebouw AKH'
+    StreetName:
+      description: | 
+        The name of the street.
+      type: string
+      maxLength: 200
+      example: 'van bijnkershoeklaan'  
+    CityName:
+      description: | 
+        The name of the city, town or village.
+      type: string
+      maxLength: 50
+      example: 'Utrecht'
+    CountryCode:
+      description: | 
+        The name of the street.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'COUNTRY'
+      type: string
+      maxLength: 30
+      example: 'NL'
+    SpecialAdministrationIndicator:
+      description: | 
+        An attribute which indicates if the person is treated by a department that performs special administration of persons.
+      type: boolean
+      example: false
+    NaturalPerson:
+      title: NaturalPerson
+      type: object
+      required:
+        - Surname
+        - NameInitial
+        - BirthDate
+        - DeceasedFlag
+      properties:
+        Surname:
+          $ref: '#/components/schemas/Surname'
+        ShortSurname:
+          $ref: '#/components/schemas/ShortSurname'
+        SurnamePrefix:
+          $ref: '#/components/schemas/SurnamePrefix'
+        SurnameSuffix:
+          $ref: '#/components/schemas/SurnameSuffix'
+        GivenName:
+          $ref: '#/components/schemas/GivenName'
+        NameInitial:
+          $ref: '#/components/schemas/NameInitial'
+        MaidenName:
+          $ref: '#/components/schemas/MaidenName'
+        MaidenNamePrefix:
+          $ref: '#/components/schemas/MaidenNamePrefix'
+        GivenNameAll:
+          $ref: '#/components/schemas/GivenNameAll'
+        NameQualificationPrefix:
+          $ref: '#/components/schemas/NameQualificationPrefix'
+        NobilitySalutation:
+          $ref: '#/components/schemas/NobilitySalutation'
+        NameQualificationSuffix:
+          $ref: '#/components/schemas/NameQualificationSuffix'
+        BirthDate:
+          $ref: '#/components/schemas/BirthDate'
+        GenderCode:
+          $ref: '#/components/schemas/GenderCode'
+        DeceasedFlag:
+          $ref: '#/components/schemas/DeceasedFlag'
+        DeathDate:
+          $ref: '#/components/schemas/DeathDate'
+    Surname:
+      description: | 
+        The surname of the Natural Person, possibly preceded by the surname of the partner.
+      type: string
+      maxLength: 200
+      example: 'Aloegigas' 
+    ShortSurname:
+      description: | 
+        The Surname of a natural person, reduced to 35 positions
+      type: string
+      maxLength: 35
+    SurnamePrefix:
+      description: | 
+        The collection of one or more prepositions and/or articles preceding the Surname (that is a significant part of the surname) and which together with the attribute Surname forms the surname.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_NAME_PREFIX'
+      type: string
+      maxLength: 20
+      example: 'Aan den'
+    SurnameSuffix:
+      description: | 
+        An addition description to the surname in order to distinct from someone else with the same name.
+      type: string
+      maxLength: 15
+      example: 'Sr.'
+      x-extensible-enum: 
+        - 'Jr.'
+        - 'Sr.'      
+    GivenName:
+      description: | 
+        The first given name of a natural person.
+      type: string
+      maxLength: 50
+      example: 'Vincent'      
+    NameInitial:
+      description: | 
+        The collection of characters formed by abbreviation, according to common use, of all given names of the Natural Person, separated by a period.
+      type: string
+      maxLength: 50
+      example: 'Ch.'      
+    MaidenName:
+      description: | 
+        The family name of the natural person, as formal registered at the Municipal Administration, stripped of all prefixes.
+      type: string
+      maxLength: 50
+      example: 'Janssen'     
+    MaidenNamePrefix:
+      description: | 
+        The collection of one or more prepositions and / or articles, which precede the significant part of the family name / birth name of a natural person.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_NAME_PREFIX'
+      type: string
+      maxLength: 10     
+    GivenNameAll:
+      description: | 
+        All given names of the Natural Person.        
+      type: string
+      maxLength: 100       
+    NameQualificationPrefix:
+      description: | 
+        The composition of protected designations, whether or not assigned by the government, a person has right to due to education, noble birth, function or appointment and which normally indicates a dignity, rank or social position and which is mentioned prior to the initials of the natural person.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_ACAD_TITLE'        
+      type: string
+      maxLength: 15 
+      example: 'Mr.'
+    NameQualificationSuffix:
+      description: | 
+        The composition of protected designations, whether or not assigned by the government, a person has right to due to education, noble birth, function or appointment and which normally indicates a dignity, rank or social position and which is mentioned after the surname of the natural person
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_SUFFIX'        
+      type: string
+      maxLength: 15 
+      example: 'MSc'     
+    NobilitySalutation:
+      description: | 
+        Protected designation, whether or not assigned by the government, a person has right to due to noble birth and which is mentioned between the initials and the surname of the natural person.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'RB_TITLE_BETW_AB'        
+      type: string
+      maxLength: 10 
+      example: 'MI'
+    BirthDate:
+      description: | 
+        Date of birth of the Natural Person.  
+      type: string
+      format: date
+      maxLength: 10 
+      example: '1987-07-21'
+    GenderCode:
+      description: | 
+        Gender code of the Natural Person.  
+      type: string
+      maxLength: 1 
+      example: 'F' 
+      x-extensible-enum: 
+        - 'M'
+        - 'F' 
+        - 'O'        
+    DeceasedFlag:
+      description: | 
+        An attribute which indicates if the relation (Natural Person) is deceased.   
+      type: boolean
+      example: false
+    DeathDate:
+      description: | 
+        Date of death of the Natural Person.  
+      type: string
+      format: date
+      maxLength: 10 
+      example: '2019-09-21'
+    Organisation:
+      title: Organisation
+      type: object
+      required:
+        - LegalStructureTypeCode
+        - LegalName
+      properties:
+        LegalStructureTypeCode:
+          $ref: '#/components/schemas/LegalStructureTypeCode'
+        LegalName:
+          $ref: '#/components/schemas/LegalName'
+        CommercialName:
+          $ref: '#/components/schemas/CommercialName'
+        ShortCommercialName:
+          $ref: '#/components/schemas/ShortCommercialName'
+        KvKNumber:
+          $ref: '#/components/schemas/KvKNumber'
+        KvKBranchnumber:
+          $ref: '#/components/schemas/KvKBranchnumber'
+        UciWorldWideId:
+          $ref: '#/components/schemas/UciWorldWideId'
+        NationalIdentifier:
+          $ref: '#/components/schemas/NationalIdentifier'
+    LegalStructureTypeCode:
+      description: | 
+        Code for the type of Legal Structure of the organisation as registered at the Chamber of Commerce.
+        **This attribute is validated against a reference data list which can be found on Rabobank's global reference data website - https://referencedata.rabobank.com/. Navigate to Digital Customer Processes tab --> CRM LOV. Filter on column 'Siebel LOV Name' where value = 'FINCORP_CLIENT_LEGAL_FORM'
+      type: string
+      maxLength: 50 
+      example: 'BV'
+    LegalName:
+      description: | 
+        The legal name of the organisation according to the bylaws / articles of association.   
+      type: string
+      maxLength: 500 
+      example: 'Koninklijke Philips N.V.'     
+    CommercialName:
+      description: | 
+        The name used by a business in the market place.   
+      type: string
+      maxLength: 70 
+      example: 'Philips'
+    ShortCommercialName:
+      description: | 
+        The shortened Organisation‘s CommercialName   
+      type: string
+      maxLength: 35 
+      example: 'KFC'
+    KvKNumber:
+      description: | 
+        The identifier of the business allocated by the Chamber of Commerce in the Netherlands.
+      type: string
+      maxLength: 8
+      example: '22109767'
+      pattern: '^[0-9]{8}$'
+    KvKBranchnumber:
+      description: | 
+        The unique identification of a branch of a subscribtion at the Chamber of Commerce in the Netherlands (KvK).
+      type: string
+      maxLength: 12
+      example: '000032109767'
+      pattern: '^[0-9]{12}$'
+    UciWorldWideId:
+      description: | 
+        Identification of the WorldWideOrganisation corresponding to the Organisation.  
+      type: string
+      maxLength: 18
+    NationalIdentifier:
+      description: | 
+        The national identifier is a commonly used identification code which enables the unambiguous identification of a counterparty or of the legal entity of which the counterparty forms part within its country of residency. For organisations located outside the Netherlands the identifier should be stored in the National Identifier. Each country has his own format(s)  
+      type: string
+      maxLength: 30
+    #Error structures
+    Error_CommPref: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807] 
+        in case of a HTTP error code 404 for Registration Query Service (RQS).
+      type: object
+      required:
+        - type
+        - title
+        - detail
+      properties:
+        type: 
+          type: string
+          format: uri
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. When dereferenced,
+            it **should** provide human-readable documentation for the problem type
+            (e.g., using HTML).
+          default: 'about:blank'
+          #example: 'https://zalando.github.io/problem/constraint-violation'
+        title:
+          type: string
+          description: |
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized); 
+          #example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          description: |
+            The HTTP status code generated by the origin server for this occurrence of the problem.
+          #example: 503
+        detail:
+          type: string
+          description: |
+            A human readable explanation specific to this occurrence of the problem.
+          #example: Connection to database timed out
+        instance:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereferenced.
+
+  examples:
+  #####################################################
+  # Reusable Responses
+  #####################################################
+
+    NaturalPerson:
+      description: An example of the response when the requestor provides the Relation ID of an Organisation. 
+      value:
+          "Relation": {
+            "RelationId": "000000000012345",
+            "InvolvedPartyCode": "Person",
+            "StatusTypeCode": "C",
+            "CorrespondenceLanguageCode": "EN",
+            "ResidenceCountryCode": "NL",
+            "WwftStatusCode": "Compliant",
+            "BankCode": "3003",
+            "LogicalLocationCode": "16",
+            "CustomerMarketSegmentCode": "90",
+            "PrimaryEmail": "test123@kpn.com",
+            "PrimaryTelephone": "+31634342156",
+            "PrimaryTelephoneType": "Mobiel",
+            "AddressTypeCode": "1",
+            "CorrespondenceFlag": "Y",
+            "PostalCode": "3521CB",
+            "HouseNumber": "23",
+            "HouseNumberExtension": "h",
+            "StreetSuffix": "gebouw 12A",
+            "StreetName": "Zuilen",
+            "CityName": "Utrecht",
+            "CountryCode": "NL",
+            "SpecialAdministrationIndicator": "N",
+            "NaturalPerson": {
+              "Surname": "Aloegigas",
+              "ShortSurname": "Aloegigas",
+              "SurnamePrefix": "Aan den",
+              "SurnameSuffix": "Sr.",
+              "GivenName": "Vincent",
+              "NameInitial": "Ch.",
+              "MaidenName": "Janssen",
+              "MaidenNamePrefix": "Aan de",
+              "GivenNameAll": "Vincent Janssen",
+              "NameQualificationPrefix": "Mr.",
+              "NameQualificationSuffix": "MSc",
+              "NobilitySalutation": "MI",
+              "BirthDate": "1987-07-21",
+              "GenderCode": "M",
+              "DeceasedFlag": "N"
+            }
+           }
+    Organisation:
+      description: An example of the response when the requestor provides the Relation ID of an Organisation.       
+      value:
+          "Relation": {
+            "RelationId": "000000000012345",
+            "InvolvedPartyCode": "Organization",
+            "StatusTypeCode": "C",
+            "CorrespondenceLanguageCode": "EN",
+            "ResidenceCountryCode": "NL",
+            "WwftStatusCode": "Compliant",
+            "BankCode": "3264",
+            "LogicalLocationCode": "32",
+            "CustomerMarketSegmentCode": "91",
+            "PrimaryEmail": "test123@kpn.com",
+            "PrimaryTelephone": "+31634342156",
+            "PrimaryTelephoneType": "Mobiel",
+            "AddressTypeCode": "1",
+            "CorrespondenceFlag": "Y",
+            "PostalCode": "3528XN",
+            "HouseNumber": "64",
+            "HouseNumberExtension": "abc",
+            "StreetSuffix": "Gebouw GBN",
+            "StreetName": "Hoog Straat",
+            "CityName": "Utrecht",
+            "CountryCode": "NL",
+            "SpecialAdministrationIndicator": "Y",
+            "Organisation": {
+              "LegalStructureTypeCode": "NV",
+              "LegalName": "Fried Chicken Center N.V.",
+              "CommercialName": "Fried Chicken Center",
+              "ShortCommercialName": "FCC",
+              "KvKNumber": "22109767",
+              "KvKBranchnumber": "000032109767"
+            }
+           }
+    
+    ERROR_400:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Bad request received",
+          "status": "400",
+          "detail": "Element Rabobank_Flow_ID is missing"
+        }
+
+    ERROR_401:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Unauthorized request received",
+          "status": "401",
+          "detail": "Unauthorized request received"
+        }
+
+    ERROR_403:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Forbidden",
+          "status": "403",
+          "detail": "The client does not have access rights to the content"
+        }
+    
+    ERROR_404:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Relation not found",
+          "status": "404",
+          "detail": "The requested Relation was not found."
+        }
+    
+    ERROR_405:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Method not allowed",
+          "status": "405",
+          "detail": "The requested method on the resource is not allowed"
+        }
+
+    ERROR_408:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Request timeout",
+          "status": "408",
+          "detail": "Request time out occured when performing action on resource"
+        }
+        
+    ERROR_500:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Internal server error",
+          "status": "500",
+          "detail": "Internal server error. Please contact system administrator."
+        }    
+        
+    ERROR_503:
+      value:
+        {
+          "type": "https://confluence.dev.rabobank.nl/display/CRMAPI/CRM+API+Error+Technical+Specifications",
+          "title": "Service Unavailable",
+          "status": "503",
+          "detail": "Service Unavailable. Please contact system administrator. The server is unable to handle the request due to temporary overloading or maintenance of the server."
+        }    
+
+  #####################################################
+  # Security Schemes
+  #####################################################
+  
+  securitySchemes:
+  
+    ApiKeyAuth:
+      type: apiKey
+      description: "API key to authorize requests."
+      name: Rabobank-ApiKey      
+      in: header
+    
+    oAuth2Auth:
+      type: oauth2
+      description: |
+        This API uses OAuth2 for authentication within the API Gateway. [More info] https://confluence.dev.rabobank.nl/pages/viewpage.action?spaceKey=Integration&title=6.+Access+APIs+secured+by+OAuth+2.0
+        By default the OAS will describe the usage of OAuth2 with client credentials but it is highly recommended to use certficates when retrieving the JWT token for Azure Active Directory (AAD).
+        Use URL to retrieve more information about registering an application in AAD and using certificates as credential.
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/6e93a626-8aca-4dc1-9191-ce291b4b75a1/oauth2/v2.0/token
+          scopes:
+              get:Relation: Grants retrieval access for Relation

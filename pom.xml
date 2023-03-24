@@ -89,6 +89,13 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>2.27.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -148,6 +155,66 @@
 						<configuration>
 							<dataFile>target/jacoco.exec</dataFile>
 							<outputDirectory>target/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>6.4.0</version>
+				<configuration>
+					<generatorName>spring</generatorName>
+					<library>spring-boot</library>
+					<supportingFilesToGenerate>
+						ApiUtil.java
+					</supportingFilesToGenerate>
+					<!-- Do not generate API classes (controllers) -->
+					<generateApis>false</generateApis>
+					<configOptions>
+						<documentationProvider>source</documentationProvider>
+						<annotationLibrary>none</annotationLibrary>
+						<!-- Disable this feature to avoid jackson-databind-nullable dependency -->
+						<openApiNullable>false</openApiNullable>
+						<!-- Use Spring Boot 3 dependencies (especially jakarta instead of javax) -->
+						<!-- <useSpringBoot3>true</useSpringBoot3> -->
+						<!-- We can disable Spring Bean Validation for generated models -->
+						<useBeanValidation>false</useBeanValidation>
+						<delegatePattern>true</delegatePattern>
+					</configOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-cki</id>
+						<goals><goal>generate</goal></goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi/api-cki.yml
+							</inputSpec>
+							<modelPackage>nl.rabobank.checks.orchestrator.client.cki.model</modelPackage>
+							<modelNamePrefix>Cki</modelNamePrefix>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-siebel</id>
+						<goals><goal>generate</goal></goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi/api-siebel-relationchecks.yml
+							</inputSpec>
+							<modelPackage>nl.rabobank.checks.orchestrator.client.siebel.model.check</modelPackage>
+							<modelNamePrefix>Siebel</modelNamePrefix>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-siebel-relation</id>
+						<goals><goal>generate</goal></goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi/api-siebel-relation.yaml
+							</inputSpec>
+							<modelPackage>nl.rabobank.checks.orchestrator.client.siebel.model.relation</modelPackage>
+							<modelNamePrefix>Siebel</modelNamePrefix>
 						</configuration>
 					</execution>
 				</executions>
