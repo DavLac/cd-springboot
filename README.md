@@ -1,5 +1,7 @@
 # Springboot - microservice training
 
+Have a look to the "solution" branch for the full implementation
+
 ## Prerequisites
 
 - Install `Postgres` locally
