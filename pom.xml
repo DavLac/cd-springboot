@@ -177,7 +177,7 @@
 						<!-- Disable this feature to avoid jackson-databind-nullable dependency -->
 						<openApiNullable>false</openApiNullable>
 						<!-- Use Spring Boot 3 dependencies (especially jakarta instead of javax) -->
-						<!-- <useSpringBoot3>true</useSpringBoot3> -->
+						<!-- disable because using springboot 2 <useSpringBoot3>true</useSpringBoot3> -->
 						<!-- We can disable Spring Bean Validation for generated models -->
 						<useBeanValidation>false</useBeanValidation>
 						<delegatePattern>true</delegatePattern>
