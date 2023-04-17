@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -23,7 +26,8 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 public class WireMockServerFacade {
 
-    private static final long ONE_SECOND = 1000L;
+    // 1 sec is not enough, some tests are failing
+    private static final Duration DEFAULT_DELAY = Duration.of(2, ChronoUnit.SECONDS);
     public static final int DEFAULT_WIRE_MOCK_SERVER_PORT = 9099;
     private WireMockServer wiremockServer;
     private MappingBuilder mappingBuilder;
@@ -40,7 +44,7 @@ public class WireMockServerFacade {
 
         // delay the start of tests to let the time to wiremock server to start
         try {
-            Thread.sleep(ONE_SECOND);
+            Thread.sleep(DEFAULT_DELAY.toMillis());
         } catch (InterruptedException ignored) {
         }
     }
