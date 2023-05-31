@@ -1,14 +1,11 @@
 package dev.courses.springdemo.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-
-import java.io.UnsupportedEncodingException;
 
 import static com.fasterxml.jackson.databind.cfg.ConstructorDetector.USE_PROPERTIES_BASED;
 
@@ -32,9 +29,15 @@ public class JsonUtils {
         }
     }
 
-    public <T> T deserializeResult(MvcResult result, Class<T> clazz)
-            throws JsonProcessingException, UnsupportedEncodingException {
-        String contentAsString = result.getResponse().getContentAsString();
-        return objectMapper.readValue(contentAsString, clazz);
+    public <T> T toObject(String jsonStringObject, Class<T> clazz) throws JsonProcessingException {
+        return objectMapper.readValue(jsonStringObject, clazz);
+    }
+
+    /**
+     * To be used when deserializing a list of objects
+     * parameter to pass : new TypeReference<List<MyClass>>(){}
+     */
+    public <T> T toCollection(String jsonStringObjectList, TypeReference<T> valueTypeRef) throws JsonProcessingException {
+        return objectMapper.readValue(jsonStringObjectList, valueTypeRef);
     }
 }
