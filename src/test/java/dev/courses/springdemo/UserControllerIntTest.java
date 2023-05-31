@@ -27,6 +27,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.util.NestedServletException;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -174,7 +175,8 @@ class UserControllerIntTest {
                 .andReturn();
 
         // read response
-        List<UserDto> response = jsonUtils.toCollection(result.getResponse().getContentAsString(), new TypeReference<List<UserDto>>(){});
+        List<UserDto> response = jsonUtils.toCollection(result.getResponse().getContentAsString(), new TypeReference<List<UserDto>>() {
+        });
 
         // assertions
         assertEquals(savedUser.getId(), response.get(0).getId());
@@ -227,6 +229,68 @@ class UserControllerIntTest {
     }
 
     @Test
+    void createPeople_wiremockCaptureBodyRequest() throws Exception {
+        // init test
+        wireMock.when(HttpMethod.POST, "/people")
+                .withBodyRequest(
+                        toJsonString(StarWarsPeople.builder()
+                                .name(SW_NAME)
+                                .birthYear(String.valueOf(SW_AGE))
+                                .height(SW_HEIGHT)
+                                .build())
+                )
+                .thenRespondJsonString(HttpStatus.OK,
+                        toJsonString(StarWarsPeople.builder()
+                                .name(SW_NAME)
+                                .birthYear(SW_BIRTH_YEAR)
+                                .height(SW_HEIGHT)
+                                .build()));
+
+        // make request
+        mockMvc.perform(
+                        post(USERS_PATH + "/people")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJsonString(
+                                        UserDto.builder()
+                                                .name(SW_NAME)
+                                                .age(SW_AGE)
+                                                .heightInCm(SW_HEIGHT)
+                                                .build()
+                                )))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        wireMock.verify(HttpMethod.POST, "/people", 1);
+    }
+
+    @Test
+    void getPeople_wiremockCaptureParameters() throws Exception {
+        // init test
+        wireMock.when(HttpMethod.GET, "/people")
+                .withQueryParams(
+                        Map.of(
+                                "param1", "value1",
+                                "param2", "value2"
+                        )
+                )
+                .thenRespondJsonString(HttpStatus.OK,
+                        toJsonString(StarWarsPeople.builder()
+                                .name(SW_NAME)
+                                .birthYear(SW_BIRTH_YEAR)
+                                .height(SW_HEIGHT)
+                                .build()));
+
+        // make request
+        mockMvc.perform(
+                        get(USERS_PATH + "/people")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        wireMock.verify(HttpMethod.GET, "/people?param1=value1&param2=value2", 1);
+    }
+
+    @Test
     void createStarWarsUser_withExistingSWCharacter_shouldCreateSWUser_usingWireMockFile() throws Exception {
         // init test
         wireMock.when(HttpMethod.GET, "/people/" + PEOPLE_ID)
@@ -252,7 +316,7 @@ class UserControllerIntTest {
     }
 
     @Test
-    void createStarWarsUser_withGatewayTimeout_shouldThrowAnError() throws Exception {
+    void createStarWarsUser_withGatewayTimeout_shouldThrowAnError() {
         // init test
         wireMock.when(HttpMethod.GET, "/people/" + PEOPLE_ID)
                 .thenRespondWithoutBody(HttpStatus.GATEWAY_TIMEOUT);

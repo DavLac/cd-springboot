@@ -8,13 +8,17 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
@@ -74,6 +78,21 @@ public class WireMockServerFacade {
     }
 
     public class StubResolver {
+
+        public StubResolver withBodyRequest(String jsonStringBodyRequest) {
+            mappingBuilder.withRequestBody(equalToJson(jsonStringBodyRequest));
+            return this;
+        }
+
+        public StubResolver withQueryParams(Map<String, String> queryParameters) {
+            if (!CollectionUtils.isEmpty(queryParameters)) {
+                for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                    mappingBuilder.withQueryParam(entry.getKey(), equalTo(entry.getValue()));
+                }
+            }
+            return this;
+        }
+
         public void thenRespondJsonFile(HttpStatus httpStatusResponse, String jsonResponseFilePath) {
             mappingBuilder.willReturn(baseResponse(httpStatusResponse)
                     .withBodyFile(jsonResponseFilePath)

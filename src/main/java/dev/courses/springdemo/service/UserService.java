@@ -2,6 +2,7 @@ package dev.courses.springdemo.service;
 
 import dev.courses.springdemo.controller.error.NotFoundException;
 import dev.courses.springdemo.gateway.starwars.StarWarsGateway;
+import dev.courses.springdemo.gateway.starwars.mapper.PeopleMapper;
 import dev.courses.springdemo.gateway.starwars.model.StarWarsPeople;
 import dev.courses.springdemo.repository.UserRepository;
 import dev.courses.springdemo.repository.model.User;
@@ -31,6 +32,16 @@ public class UserService {
     public UserDto createUser(UserDto userDto) {
         var savedUser = userRepository.save(UserMapper.toEntity(userDto));
         return UserMapper.toDto(savedUser);
+    }
+
+    public UserDto createPeople(UserDto userDto) {
+        var savedUser = starWarsGateway.fakeCallWithBody(PeopleMapper.toPeople(userDto));
+        return PeopleMapper.toDto(savedUser);
+    }
+
+    public UserDto getPeople() {
+        var savedUser = starWarsGateway.fakeCallWithParameters();
+        return PeopleMapper.toDto(savedUser);
     }
 
     public List<UserDto> getAllUsers() {

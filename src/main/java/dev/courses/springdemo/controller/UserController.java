@@ -91,6 +91,26 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(userDto));
     }
 
+    /**
+     * Not restful endpoint. Made to test wiremock IT tests (capturing request body)
+     */
+    @PostMapping("people")
+    @Operation(description = "Create a star wars people")
+    public ResponseEntity<UserDto> createPeopleFakeEndpoint(
+            @RequestBody
+            UserDto userDto) {
+        return ResponseEntity.ok(userService.createPeople(userDto));
+    }
+
+    /**
+     * Not restful endpoint. Made to test wiremock IT tests (capturing parameters)
+     */
+    @GetMapping("people")
+    @Operation(description = "Create a star wars people")
+    public ResponseEntity<UserDto> getPeopleFakeEndpoint() {
+        return ResponseEntity.ok(userService.getPeople());
+    }
+
     @PutMapping("{userId}")
     @Operation(description = "Update a user by id")
     @ApiResponses(value = {

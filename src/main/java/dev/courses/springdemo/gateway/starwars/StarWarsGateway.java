@@ -7,15 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class StarWarsGateway {
-
-    private static final String PEOPLE_PATH = "%s/people/{peopleId}";
 
     // private final RestTemplate restTemplate;
 
@@ -26,9 +23,38 @@ public class StarWarsGateway {
         Map<String, ?> parameters = Map.of("peopleId", peopleId);
         try {
             return new RestTemplateBuilder().build().getForObject(
-                    String.format(PEOPLE_PATH, starWarsApiUrl),
+                    "%s/people/{peopleId}".formatted(starWarsApiUrl),
                     StarWarsPeople.class,
                     parameters
+            );
+        } catch (HttpClientErrorException ex) {
+            throw new BadGatewayException("Error when calling Star Wars API", ex);
+        }
+    }
+
+    /**
+     * Fake non-existing API. Made to test wiremock IT tests with body matcher (capturing request body)
+     */
+    public StarWarsPeople fakeCallWithBody(StarWarsPeople request) {
+        try {
+            return new RestTemplateBuilder().build().postForObject(
+                    "%s/people".formatted(starWarsApiUrl),
+                    request,
+                    StarWarsPeople.class
+            );
+        } catch (HttpClientErrorException ex) {
+            throw new BadGatewayException("Error when calling Star Wars API", ex);
+        }
+    }
+
+    /**
+     * Fake non-existing API. Made to test wiremock IT tests with parameters matcher (capturing parameters)
+     */
+    public StarWarsPeople fakeCallWithParameters() {
+        try {
+            return new RestTemplateBuilder().build().getForObject(
+                    "%s/people?param1=value1&param2=value2".formatted(starWarsApiUrl),
+                    StarWarsPeople.class
             );
         } catch (HttpClientErrorException ex) {
             throw new BadGatewayException("Error when calling Star Wars API", ex);

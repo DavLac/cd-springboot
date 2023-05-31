@@ -33,4 +33,22 @@ public class UserMapper {
                 .heightInCm(people.getHeight())
                 .build();
     }
+
+    public static StarWarsPeople toStarWarsPeople(UserDto dto) {
+        return StarWarsPeople.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .birthYear(String.valueOf(dto.getAge()))
+                .height(dto.getHeightInCm())
+                .build();
+    }
+
+    public static User toDto(StarWarsPeople people) {
+        return User.builder()
+                .id(people.getId())
+                .name(people.getName())
+                .age(getAgeFromDateOfBirth(people.getBirthYear()))
+                .heightInCm(people.getHeight())
+                .build();
+    }
 }
