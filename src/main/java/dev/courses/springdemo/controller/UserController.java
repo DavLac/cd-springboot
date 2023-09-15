@@ -1,5 +1,6 @@
 package dev.courses.springdemo.controller;
 
+import dev.courses.springdemo.revision.AuditContextHolder;
 import dev.courses.springdemo.service.UserService;
 import dev.courses.springdemo.service.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final AuditContextHolder auditContextHolder;
 
     @GetMapping("{userId}")
     @Operation(description = "Get user by ID")

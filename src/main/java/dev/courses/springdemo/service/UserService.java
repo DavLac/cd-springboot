@@ -6,6 +6,8 @@ import dev.courses.springdemo.gateway.starwars.mapper.PeopleMapper;
 import dev.courses.springdemo.gateway.starwars.model.StarWarsPeople;
 import dev.courses.springdemo.repository.UserRepository;
 import dev.courses.springdemo.repository.model.User;
+import dev.courses.springdemo.revision.UserAuditContext;
+import dev.courses.springdemo.revision.AuditContextHolder;
 import dev.courses.springdemo.service.dto.UserDto;
 import dev.courses.springdemo.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StarWarsGateway starWarsGateway;
+    private final AuditContextHolder contextHolder;
 
     public UserDto getUserById(long userId) {
         return userRepository.findById(userId)
@@ -74,8 +77,10 @@ public class UserService {
     }
 
     public UserDto createStarWarsUser(long starWarsCharacterId) {
-        StarWarsPeople starWarsPeople = starWarsGateway.getPeopleById(starWarsCharacterId);
-        var savedUser = userRepository.save(UserMapper.toEntity(starWarsPeople));
-        return UserMapper.toDto(savedUser);
+        try(AuditContextHolder.AuditContextCloseable ignore = contextHolder.setAuditContext(new UserAuditContext("My user"))){
+            StarWarsPeople starWarsPeople = starWarsGateway.getPeopleById(starWarsCharacterId);
+            var savedUser = userRepository.save(UserMapper.toEntity(starWarsPeople));
+            return UserMapper.toDto(savedUser);
+        }
     }
 }

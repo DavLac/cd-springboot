@@ -1,10 +1,12 @@
 package dev.courses.springdemo.repository.model;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
+@Audited
 @Table(name = "users")
 @Getter
 @Setter
